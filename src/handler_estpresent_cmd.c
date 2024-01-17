@@ -1,15 +1,16 @@
-#include "../../common/include/bd.h"
-#include "../../common/include/messages.h"
 
+#include "handler.h"
 
 //renvoie 0 si l'ID n'éxiste pas sinon renvoie 1
-int estpresent(Commande* cmd,sqlite3 *db){
+int handlerestpresent(sqlite3 *db,Commande* cmd){
 
     if(getIdFromNumeroID(db,cmd->commande.estPresent.identifiant,  strlen(cmd->commande.estPresent.identifiant)+1 )== -1){
-        return 0;
+        return -1;
     }
     else{
-        return 1;
+        printf("Electeur creer");
+
+        return 0;
     }
 
 

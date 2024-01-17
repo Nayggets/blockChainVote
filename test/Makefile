@@ -8,7 +8,7 @@ PROJECTLIB=-lvoting
 
 $(shell mkdir -p $(BUILDDIR))
 
-all: $(BUILDDIR)/test_electeur $(BUILDDIR)/test_election $(BUILDDIR)/test_vote $(BUILDDIR)/testsqlite
+all: $(BUILDDIR)/test_electeur $(BUILDDIR)/test_election $(BUILDDIR)/test_vote $(BUILDDIR)/testsqlite $(BUILDDIR)/server_test
 
 
 $(BUILDDIR)/test_electeur: test_electeur.c
@@ -22,6 +22,9 @@ $(BUILDDIR)/test_vote: test_vote.c
 
 $(BUILDDIR)/testsqlite: testsqlite.c
 	$(CC) testsqlite.c $(CFLAGS) $(PROJECTLIBDIR) $(PROJECTLIB) $(LIBS) -o $(BUILDDIR)/testsqlite
+
+$(BUILDDIR)/server_test: testsqlite.c
+	$(CC) ./server_test.c $(CFLAGS) $(PROJECTLIBDIR) $(PROJECTLIB) $(LIBS) -o $(BUILDDIR)/serveur
 
 
 clean:
