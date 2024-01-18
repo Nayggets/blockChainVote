@@ -1,4 +1,5 @@
 #include "../common/include/votechain.h"
+#include "../common/include/crypto.h"
 
 #include <glib.h>
 #include <stdio.h>
@@ -76,6 +77,7 @@ int main(int argc, char *argv[])
 
         // la phase de vote
         char ballot1[BALLOT_SIZE] = {0x01};
+        
         Election_castVote(db, electeur_n01, election_LocalId, ballot1, BALLOT_SIZE, "TODO");
 
         char ballot2[BALLOT_SIZE] = {0x00};

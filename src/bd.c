@@ -292,8 +292,7 @@ void readElection(sqlite3 *db, int id)
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            // Traiter les résultats ici
-            // Exemple : printf("%s\n", sqlite3_column_text(stmt, 2)); // Pour la colonne 'question'
+            printf("%s\n", sqlite3_column_text(stmt, 2)); // Pour la colonne 'question'
         }
 
         sqlite3_finalize(stmt);

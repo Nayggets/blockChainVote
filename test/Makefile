@@ -8,7 +8,7 @@ PROJECTLIB=-lvoting
 
 $(shell mkdir -p $(BUILDDIR))
 
-all: $(BUILDDIR)/test_electeur $(BUILDDIR)/test_election $(BUILDDIR)/test_vote $(BUILDDIR)/testsqlite $(BUILDDIR)/test_creation_electeur $(BUILDDIR)/server_test
+all: $(BUILDDIR)/test_electeur $(BUILDDIR)/test_election $(BUILDDIR)/test_vote $(BUILDDIR)/testsqlite $(BUILDDIR)/test_creation_electeur $(BUILDDIR)/server_test $(BUILDDIR)/test_crypto.bin
 
 
 
@@ -31,6 +31,8 @@ $(BUILDDIR)/server_test: testsqlite.c
 $(BUILDDIR)/test_creation_electeur: test_creation_electeur.c
 	$(CC) test_creation_electeur.c $(CFLAGS) $(PROJECTLIBDIR) $(PROJECTLIB) $(LIBS) -o $(BUILDDIR)/test_creation_electeur
 
+$(BUILDDIR)/test_crypto.bin: test_crypto.c
+	$(CC) test_crypto.c $(CFLAGS) $(PROJECTLIBDIR) $(PROJECTLIB) $(LIBS) -lgmp -o $(BUILDDIR)/test_crypto.bin
 
 clean:
 	rm $(BUILDDIR)/test_vote; rm $(BUILDDIR)/test_election; rm $(BUILDDIR)/test_electeur 
