@@ -11,7 +11,6 @@ int handlerajoutelecteur(sqlite3 *db, Commande *cmd) {
     {
         createElecteur(db, id, strlen(id)+1);
         printf("Electeur creer");
-        createElecteur(db, id, strlen(id) + 1);
         return 0;
     }
     return -1;
