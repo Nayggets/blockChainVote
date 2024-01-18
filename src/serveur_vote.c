@@ -86,32 +86,37 @@ void* worker(void* data)
     while(1){
         Commande* commande = accessCommand();
         printf("Traitement Commande %d\n",commande->type);
-        if(commande->type == AJOUT_ELECTEUR){
+        switch (commande->type)
+        {
+        case AJOUT_ELECTEUR:
             if(handlerajoutelecteur(db,commande) == 0){
                 printf("Electeur ajouter\n");
             }
             else{
                 printf("Error lors de l'ajout");
             }
-        }
-        else if(commande->type == SUPPRIME_ELECTEUR){
+            break;
+        case SUPPRIME_ELECTEUR:
             if(handlersupprimeElecteur(db,commande) == 0){
                 printf("Electeur supprimer\n");
             }
             else{
                 printf("Error lors de la suppression");
             }
-        }
-        else if(commande->type == EST_PRESENT){
+            break;
+        case EST_PRESENT:
             if(handlerestpresent(db,commande) == 0){
                 printf("Electeur est present\n");
             }
             else{
                 printf("Error lors du check est present");
             }
-        }
-        else{
-            printf("Commande inconnu abandon du traitement.");
+            break;
+        case CAST_VOTE:
+            break;
+        default:
+            printf("Commande inconnu abandon du traitement.\n");
+            break;
         }
         free(commande);
     }
