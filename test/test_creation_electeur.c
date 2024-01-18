@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sqlite3.h>
-#include "../src/handler/handler_ajoutelecteur.c"
+#include "../src/handler_ajoutelecteur.c"
 
 int main(int argc, char *argv[]) {
     

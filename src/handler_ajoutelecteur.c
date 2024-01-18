@@ -1,8 +1,8 @@
 
 #include "handler.h"
 #include <stdio.h>
-#include "../../common/include/messages.h"
-#include "../../common/include/bd.h"
+#include "../common/include/messages.h"
+#include "../common/include/bd.h"
 
 // Fonction pour ajouter un électeur
 int handlerajoutelecteur(sqlite3 *db, Commande *cmd) {
