@@ -1,5 +1,7 @@
 #include "../common/include/votechain.h"
-#include "./handler.h"
+#include "../common/include/crypto.h"
+
+#include "../common/include/handler.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>

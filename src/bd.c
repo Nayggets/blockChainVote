@@ -1,4 +1,6 @@
 #include "../common/include/bd.h"
+#include "../common/include/crypto.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -353,6 +355,7 @@ void deleteElection(sqlite3 *db, int id)
 void Election_castVote(sqlite3 *db, int idVotant, int idElection, const void *ballot, int ballotSize, const char *hashValidation)
 {
     sqlite3_stmt *stmt;
+
     const char *sql = "INSERT INTO Vote (idVotant, idElection, timestamp, ballot, hashValidation) VALUES (?, ?, datetime('now'), ?, ?);";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
@@ -379,14 +382,27 @@ void Election_castVote(sqlite3 *db, int idVotant, int idElection, const void *ba
     }
 }
 
+void voidstartompz(mpz_t* mpz,void* data)
+{
+    mpz_set_str(*mpz,data,10);
+}
+
 //
-void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_option1, int *p_totalvotes)
+void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_option1, int *p_totalvotes,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n)
 {
     sqlite3_stmt *stmt;
     const char *sql = "SELECT * FROM Vote WHERE idElection = ?;";
     *p_totalvotes = 0;
     *p_option0 = 0;
     *p_option1 = 0;
+    mpz_t total;
+    mpz_t ballotBlob2;
+
+    mpz_inits(total,ballotBlob2,NULL);
+    //mpz_inits(total,NULL);
+    mpz_set_ui(total, 0x00);
+    encrypt(total, total, n, g);
+
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
     {
@@ -397,12 +413,17 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
             // Récupérer les données de chaque vote
             int voteId = sqlite3_column_int(stmt, 0); // id
             // Autres colonnes peuvent être récupérées ici
-            const void *ballotBlob = sqlite3_column_blob(stmt, 4);
+            
+            const void* ballotBlob = sqlite3_column_blob(stmt, 4);
+            //mpz_t t = *((char*) ballotBlob);
             int blobSize = sqlite3_column_bytes(stmt, 4);
+            mpz_set_str(ballotBlob2,(char*)ballotBlob,10);
             // Traiter les données du vote
             // printf("Traitement du vote ID: %d\n", voteId);
             // Ajoutez ici le code pour traiter chaque vote
+            mpz_mul(total,total,ballotBlob2);
             *p_totalvotes = *p_totalvotes + 1;
+            /*
             int v = *((char *)ballotBlob);
             if (v)
             {
@@ -412,6 +433,7 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
             {
                 *p_option0 = *p_option0 + 1;
             }
+            */
         }
 
         sqlite3_finalize(stmt);
@@ -419,5 +441,23 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
     else
     {
         fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+    decrypt(total,total,lambda,mu,n);
+    unsigned int valueTotal = mpz_get_ui(total);
+    printf("Decrypted value %d\n",valueTotal);
+
+    float divide = (float) valueTotal / *p_totalvotes;
+    printf("Decrypted value %f\n",divide);
+
+    if(divide > 0.5){
+        *p_option0 = 1;
+
+    }
+    else if(divide < 0.5){
+        *p_option1 = 1;
+    }
+    else{
+        *p_option1 = 1;
+        *p_option0 = 1;
     }
 }

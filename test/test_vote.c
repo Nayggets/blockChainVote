@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #define V if (verbose)
 #define ID_SIZE 10
-#define BALLOT_SIZE 1
+#define BALLOT_SIZE 8
 
 int main(int argc, char *argv[])
 {
@@ -76,14 +77,32 @@ int main(int argc, char *argv[])
         // la phase de vote
 
         // la phase de vote
-        char ballot1[BALLOT_SIZE] = {0x01};
-        
+        mpz_t n, lambda, g, mu, m, c;
+        mpz_inits(g, mu, m, c, NULL);
+        mpz_set_ui(m, 0x00);
+
+        generate_keys(n, lambda, g, mu);
+
+        encrypt(c,m,n,g);
+        char ballot1[BALLOT_SIZE];
+        mpz_get_str(ballot1,10,c);
+        printf("ballot1 %s\n",ballot1);
         Election_castVote(db, electeur_n01, election_LocalId, ballot1, BALLOT_SIZE, "TODO");
+        mpz_set_ui(m, 0x00);
+        encrypt(c,m,n,g);
+        char ballot2[BALLOT_SIZE];
+        mpz_get_str(ballot2,10,c);
+        printf("ballot2 %s\n",ballot2);
 
-        char ballot2[BALLOT_SIZE] = {0x00};
+
         Election_castVote(db, electeur_n02, election_LocalId, ballot2, BALLOT_SIZE, "TODO");
+        mpz_set_ui(m, 0x01);
 
-        char ballot3[BALLOT_SIZE] = {0x00};
+        encrypt(c,m,n,g);
+        char ballot3[BALLOT_SIZE];
+        mpz_get_str(ballot3,10,c);
+        printf("ballot3 %s\n",ballot3);
+
         Election_castVote(db, electeur_n03, election_LocalId, ballot3, BALLOT_SIZE, "TODO");
 
         // le résultat de l'election
@@ -91,7 +110,7 @@ int main(int argc, char *argv[])
         int yes = 0;
         int total = 0;
 
-        Election_processVotes(db, election_LocalId, &no, &yes, &total);
+        Election_processVotes(db, election_LocalId, &no, &yes, &total,g,lambda,mu,n);
 
         printf("Résultat de l'élection: \n A la question '%s'\n Nombre de votant %d\n\t\tOui : %d (%.2f%%)\n\t\tNon : %d (%.2f%%)\n", question, total, yes, (total != 0) ? (double)yes * 100. / total : 0.0, no, (total != 0) ? (double)no * 100. / total : 0.0);
     }

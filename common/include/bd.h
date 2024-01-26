@@ -2,7 +2,7 @@
 #define BD__
 
 #include <sqlite3.h>
-
+#include "./crypto.h"
 sqlite3 *database_open(const char *path);
 int database_close(sqlite3 *db);
 int database_init(sqlite3 *db);
@@ -23,5 +23,5 @@ int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size);
 
 void Election_castVote(sqlite3 *db, int idVotant, int idElection, const void *ballot, int ballotSize, const char *hashValidation);
 // int Election_resultat(sqlite3 *db, int localid, int *numberOption0, int *numberOption1, int *totalVotes);
-void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_option1, int *p_totalvotes);
+void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_option1, int *p_totalvotes,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n);
 #endif

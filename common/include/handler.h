@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../common/include/bd.h"
-#include "../common/include/messages.h"
+#include "./bd.h"
+#include "./messages.h"
 
 
 int handlerestpresent(sqlite3 *db,Commande* cmd);

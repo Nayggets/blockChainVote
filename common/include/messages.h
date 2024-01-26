@@ -1,6 +1,6 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
-
+#include <aio.h>
 #include "protocol.h"
 
 typedef struct
