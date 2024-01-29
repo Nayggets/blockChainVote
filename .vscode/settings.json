@@ -2,6 +2,7 @@
     "files.associations": {
         "handler.h": "c",
         "stdio.h": "c",
-        "votechain.h": "c"
+        "votechain.h": "c",
+        "unistd.h": "c"
     }
 }

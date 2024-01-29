@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/glib-2.0"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "compilerArgs": [
+                "\"--libs\", \"glib-2.0\"",
+                "\"--cflags\", \"glib-2.0\"",
+                "-lssl",
+                "-lcrypto"
+            ]
+        }
+    ],
+    "version": 4
+}

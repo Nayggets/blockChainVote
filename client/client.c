@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#include "../common/include/messages.h"
 
 SSL_CTX* init_ssl_context() {
     SSL_library_init();
@@ -16,7 +17,82 @@ SSL_CTX* init_ssl_context() {
         perror("Failed to initialize SSL context");
         exit(EXIT_FAILURE);
     }
+    SSL_CTX_use_certificate_file(ctx, "mycert.pem", SSL_FILETYPE_PEM);
     return ctx;
+}
+
+#define QUIT 5
+#define CREERELECTOR 1
+#define SUPPRIMERELECTEUR 2
+#define VOTEELECTEUR 3
+#define CLOREVOTE 4
+
+void menu_test(SSL* ssl)
+{
+    char number[2];
+    int check = 0;
+    Commande commande;
+    while(atoi(number) != QUIT)
+    {
+        printf("Que voulez vous faire?\n");
+        printf("1. Creer electeur\n");
+        printf("2. Supprimer electeur\n");
+        printf("3. Voter\n");
+        printf("4. Clore un vote\n");
+        printf("5. Quit\n");
+        check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+        if(check == -1){
+            perror("read");
+        }
+
+        switch(atoi(number))
+        {
+            case CREERELECTOR:
+            {
+                //creer electeur
+                
+                printf("Entrez id/nom electeur\n");
+                check = read(1,commande.commande.ajoutElecteur.identifiant,256);
+                commande.commande.ajoutElecteur.identifiant[check] = '\0'; 
+                commande.type = AJOUT_ELECTEUR;
+                memset(commande.signature,0,256);
+                SSL_write(ssl,&commande,sizeof(Commande));
+                break;
+            }
+            case SUPPRIMERELECTEUR:
+            {
+                printf("Entrez id/nom electeur\n");
+                check = read(1,commande.commande.supprimeElecteur.identifiant,256);
+                commande.commande.supprimeElecteur.identifiant[check] = '\0';
+                // supprimer electeur
+                commande.type = SUPPRIME_ELECTEUR;
+                memset(commande.signature,0,256);
+                SSL_write(ssl,&commande,sizeof(Commande));
+                break;
+            }
+            case VOTEELECTEUR:
+            {
+                //verifier electeur existe
+                commande.type = EST_PRESENT;
+                memset(commande.signature,0,256);
+                //voter
+                break;
+            }
+            case CLOREVOTE:
+            {
+                //clore le vote et avoir le resultat
+                memset(commande.signature,0,256);
+                commande.type = CAST_VOTE;
+                break;
+            }
+            case QUIT:
+            {
+                printf("application quited\n");
+                break;
+            }
+        }
+    }
+
 }
 
 int main(int argc, char *argv[]) {
@@ -65,7 +141,7 @@ int main(int argc, char *argv[]) {
         perror("SSL handshake failed");
         exit(EXIT_FAILURE);
     }
-
+    menu_test(ssl);
     // Envoi et réception de données sécurisées
     const char* message = "Zizon connecté";
     SSL_write(ssl, message, strlen(message));

@@ -1,8 +1,4 @@
-
 #include "../common/include/handler.h"
-#include <stdio.h>
-#include "../common/include/messages.h"
-#include "../common/include/bd.h"
 
 //renvoie 0 si l'ID n'éxiste pas sinon renvoie 1
 int handlerestpresent(sqlite3 *db,Commande* cmd){
