@@ -77,6 +77,7 @@ void menu_test(SSL* ssl)
                 printf("Entrez id/nom de l'election\n");
                 check = read(1,commande.commande.castVote.idElection,256);
                 commande.commande.castVote.idElection[check-1] = '\0';
+                printf("Id Election recuperer%s\n",commande.commande.castVote.idElection);
                 printf("Entrez id/nom de l'electeur\n");
                 check = read(1,commande.commande.castVote.identifiant,256);
                 commande.commande.castVote.identifiant[check-1] = '\0';
@@ -95,6 +96,7 @@ void menu_test(SSL* ssl)
                     commande.commande.castVote.ballot = 0;
 
                 }
+                commande.commande.castVote.ballotSize = 4;
                 commande.type = CAST_VOTE;
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
@@ -119,7 +121,6 @@ void menu_test(SSL* ssl)
                 commande.type = AJOUT_ELECTION;
                 printf("Entrer id/nom de l'election\n");
                 check = read(1,commande.commande.ajoutElection.identifiant,256);
-                commande.commande.ajoutElection.identifiant[check] = '\0';
                 commande.commande.ajoutElection.identifiant[check-1] = '\0';
 
                 printf("Entrer la date de debut format (jj/mm/aaaa)\n");

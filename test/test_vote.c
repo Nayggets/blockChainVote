@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
         // la phase de vote
         mpz_t n, lambda, g, mu, m, c;
-        mpz_inits(g, mu, m, c, NULL);
+        mpz_inits(g, mu,NULL);
         mpz_set_ui(m, 0x00);
 
         generate_keys(n, lambda, g, mu);

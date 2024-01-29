@@ -7,10 +7,10 @@
 // Fonction pour mettre a jour un électeur
 int handlerupdateelecteur(sqlite3 *db, Commande *cmd) {
     char *id = cmd->commande.updateElecteur.identifiant;
-    if (electeurExists(db, id, strlen(id) + 1) == 0)
+    if (electeurExists(db, id, strlen(id)) == 0)
     {
         
-        updateElecteur(db, id, strlen(id)+1, cmd->commande.updateElecteur.newId,strlen(cmd->commande.updateElecteur.newId)+1);
+        updateElecteur(db, id, strlen(id), cmd->commande.updateElecteur.newId,strlen(cmd->commande.updateElecteur.newId)+1);
         printf("Electeur mis a jour");
         return 0;
     }

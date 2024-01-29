@@ -24,6 +24,7 @@
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_cond_t cond2 = PTHREAD_COND_INITIALIZER;
+mpz_t n, lambda, g, mu;
 Commande commandes[256];
 int index_commandes = 0;
 const int PORT = 8888;
@@ -59,6 +60,9 @@ void* receiveCommand(void* data)
 
 void launch(void* data)
 {
+    mpz_inits(g, mu,NULL);
+    generate_keys(n, lambda, g, mu);
+
     int needInit = database_exists("exemple.db");
     struct stat buffer;
     sqlite3 *db = database_open("exemple.db");
@@ -237,14 +241,14 @@ void* worker(void* data)
             }
             break;
         case CAST_VOTE:
-        /*
+        
             if(handlercastvote(db,commande) == 0){
                 printf("Vote a fonctionner\n");
             }
             else{
                 printf("Error lors du vote\n");
             }
-            */
+            
             break;
         case AJOUT_ELECTION:
             if(handlerAjoutelection(db,commande) == 0){
@@ -253,6 +257,7 @@ void* worker(void* data)
             else{
                 printf("Error lors de la creation d'election\n");
             }
+            break;
         default:
             printf("Commande inconnu abandon du traitement.\n");
             break;

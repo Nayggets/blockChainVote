@@ -141,6 +141,7 @@ int electeurExists(sqlite3 *db, const char *numeroID, int size)
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
             result = sqlite3_column_int(stmt, 0) > 0;
+            printf("result electeur exists %i and value %d",result,sqlite3_column_int(stmt, 0));
         }
 
         sqlite3_finalize(stmt);
@@ -270,6 +271,8 @@ int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size)
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
             id = sqlite3_column_int(stmt, 0); // Récupère l'ID de la première colonne
+            printf("id election exists %i",id);
+
         }
 
         sqlite3_finalize(stmt);
