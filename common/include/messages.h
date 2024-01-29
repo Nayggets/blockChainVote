@@ -22,7 +22,7 @@ typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
     char idElection[ENTITY_ID_SIZE];
-    const void *ballot;
+    int ballot;
     size_t ballotSize;
 } CastVoteCmd;
 
@@ -43,7 +43,7 @@ typedef struct
     char question[256];
     char dateDebut[256];
     char dateFin[256];
-    const char *status[256];
+    char status[256];
 } AjoutElectionCmd;
 
 typedef struct

@@ -26,6 +26,7 @@ SSL_CTX* init_ssl_context() {
 #define SUPPRIMERELECTEUR 2
 #define VOTEELECTEUR 3
 #define CLOREVOTE 4
+#define AJOUTERELECTION 6
 
 void menu_test(SSL* ssl)
 {
@@ -53,7 +54,7 @@ void menu_test(SSL* ssl)
                 
                 printf("Entrez id/nom electeur\n");
                 check = read(1,commande.commande.ajoutElecteur.identifiant,256);
-                commande.commande.ajoutElecteur.identifiant[check] = '\0'; 
+                commande.commande.ajoutElecteur.identifiant[check-1] = '\0'; 
                 commande.type = AJOUT_ELECTEUR;
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
@@ -63,7 +64,7 @@ void menu_test(SSL* ssl)
             {
                 printf("Entrez id/nom electeur\n");
                 check = read(1,commande.commande.supprimeElecteur.identifiant,256);
-                commande.commande.supprimeElecteur.identifiant[check] = '\0';
+                commande.commande.supprimeElecteur.identifiant[check-1] = '\0';
                 // supprimer electeur
                 commande.type = SUPPRIME_ELECTEUR;
                 memset(commande.signature,0,256);
@@ -73,8 +74,33 @@ void menu_test(SSL* ssl)
             case VOTEELECTEUR:
             {
                 //verifier electeur existe
-                commande.type = EST_PRESENT;
+                printf("Entrez id/nom de l'election\n");
+                check = read(1,commande.commande.castVote.idElection,256);
+                commande.commande.castVote.idElection[check-1] = '\0';
+                printf("Id Election recuperer%s\n",commande.commande.castVote.idElection);
+                printf("Entrez id/nom de l'electeur\n");
+                check = read(1,commande.commande.castVote.identifiant,256);
+                commande.commande.castVote.identifiant[check-1] = '\0';
+                printf("option 0. ou option 1.\n");
+                check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+
+                while(atoi(number) != 0 && atoi(number) != 1)
+                {
+                    printf("option 0. ou option 1.\n");
+                    check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+                }
+                if(atoi(number) == 1){
+                    commande.commande.castVote.ballot = 1;
+                }
+                else{
+                    commande.commande.castVote.ballot = 0;
+
+                }
+                commande.commande.castVote.ballotSize = 4;
+                commande.type = CAST_VOTE;
                 memset(commande.signature,0,256);
+                SSL_write(ssl,&commande,sizeof(Commande));
+
                 //voter
                 break;
             }
@@ -88,6 +114,30 @@ void menu_test(SSL* ssl)
             case QUIT:
             {
                 printf("application quited\n");
+                break;
+            }
+            case AJOUT_ELECTION:
+            {
+                commande.type = AJOUT_ELECTION;
+                printf("Entrer id/nom de l'election\n");
+                check = read(1,commande.commande.ajoutElection.identifiant,256);
+                commande.commande.ajoutElection.identifiant[check-1] = '\0';
+
+                printf("Entrer la date de debut format (jj/mm/aaaa)\n");
+                check = read(1,commande.commande.ajoutElection.dateDebut,256);
+                commande.commande.ajoutElection.dateDebut[check-1] = '\0';
+                
+                printf("Entrer la date de fin format (jj/mm/aaaa)\n");
+                check = read(1,commande.commande.ajoutElection.dateFin,256);
+                commande.commande.ajoutElection.dateFin[check-1] = '\0';
+                
+                printf("Entrez votre question fermer(oui/non)\n");
+                check = read(1,commande.commande.ajoutElection.question,256);
+                commande.commande.ajoutElection.question[check-1] = '\0';
+
+                strcpy(commande.commande.ajoutElection.status,"active\0");
+
+                SSL_write(ssl,&commande,sizeof(Commande));
                 break;
             }
         }

@@ -6,10 +6,11 @@
 
 // Fonction pour mettre a jour une election
 int handlerUpdateElection(sqlite3 *db, Commande *cmd) {
-    char *id = cmd->commande.updateElection.identifiant;
-    if (Election_getIdFromNumeroID(db, id, strlen(id) + 1) == 0)
+    char* id = cmd->commande.updateElection.identifiant;
+    int realid = Election_getIdFromNumeroID(db, id, strlen(id));
+    if (realid > 0)
     {
-        updateElection(db, id, strlen(id)+1, cmd->commande.updateElection.question);
+        updateElection(db, realid, cmd->commande.updateElection.question);
         printf("Election mise a jour");
         return 0;
     }

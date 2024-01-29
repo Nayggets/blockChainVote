@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <sqlite3.h>
-#include "../src/handler_ajoutelecteur.c"
+#include "../common/include/handler.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     
     sqlite3 *db;
    
