@@ -9,6 +9,7 @@ int main()
     pthread_t pthread;
     int thread = 4;
     launch(&thread);
+    /* Obsolet depuis le switch TCP mais valider avant
     printf("Server launch\n");
     Commande commande;
     commande.type = EST_PRESENT;
@@ -37,4 +38,5 @@ int main()
     fillCommand(commande);
     fillCommand(commande2);
     sleep(20);
+    */
 }

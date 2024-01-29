@@ -1,6 +1,17 @@
 #include "../common/include/votechain.h"
 #include "../common/include/crypto.h"
-
+#include <arpa/inet.h> // inet_addr()
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h> // bzero()
+#include <sys/socket.h>
+#include <unistd.h> // read(), write(), close()
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
 #include "../common/include/handler.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,15 +20,42 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <glib.h>
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_cond_t cond2 = PTHREAD_COND_INITIALIZER;
 Commande commandes[256];
 int index_commandes = 0;
+const int PORT = 8888;
+
 
 void* worker(void*);
+int fillCommand(Commande commande);
+
+
+typedef struct client_fd
+{
+    int fd;
+    SSL* ssl;
+} client_fd;
+
+void* receiveCommand(void* data)
+{
+    client_fd* client = data;
+    int size = sizeof(Commande);
+    char buff[sizeof(Commande)];
+    size = SSL_read(client->ssl,buff,size);
+    while(size == sizeof(Commande)){
+        Commande* commande;
+        commande = (Commande*)&buff[0];
+        fillCommand(*commande);
+        size = SSL_read(client->ssl,buff,size);
+
+    }
+    printf("Client left\n");
+    close(client->fd);
+    SSL_free(client->ssl);
+}
 
 
 void launch(void* data)
@@ -35,6 +73,90 @@ void launch(void* data)
     pthread_t* t =malloc(sizeof(pthread_t) * n);
     for(int i = 0 ; i < n ;i++){
         pthread_create(&t[i],NULL,worker,db);
+    }
+
+    int sockfd, connfd, len; 
+    struct sockaddr_in servaddr, cli; 
+    SSL_CTX *ctx;
+    //SSL *ssl;   
+ 
+
+    /* Create a TLS server context with certificates */
+
+    ctx = SSL_CTX_new(TLS_server_method());
+
+    SSL_CTX_use_certificate_file(ctx, "server.crt", SSL_FILETYPE_PEM);
+
+    SSL_CTX_use_PrivateKey_file(ctx, "server.key", SSL_FILETYPE_PEM);
+
+ 
+    // socket create and verification 
+    sockfd = socket(AF_INET, SOCK_STREAM, 0); 
+    if (sockfd == -1) { 
+        printf("socket creation failed...\n"); 
+        exit(0); 
+    } 
+    else
+        printf("Socket successfully created..\n"); 
+    bzero(&servaddr, sizeof(servaddr)); 
+   
+    // assign IP, PORT 
+    servaddr.sin_family = AF_INET; 
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+    servaddr.sin_port = htons(PORT); 
+   
+    // Binding newly created socket to given IP and verification 
+    if ((bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) { 
+        printf("Socket bind failed...\n"); 
+        exit(0); 
+    } 
+    else
+        printf("Socket successfully binded..\n"); 
+   
+    // Now server is ready to listen and verification 
+    if ((listen(sockfd, 5)) != 0) { 
+        printf("Listen failed...\n"); 
+        exit(0); 
+    } 
+    else
+        printf("Server listening..\n"); 
+    len = sizeof(cli); 
+    SSL* ssl;
+    client_fd* client;
+    // Accept the data packet from client and verification 
+    int check = 0;
+    while(1)
+    {
+        client = malloc(sizeof(client_fd));
+        connfd = accept(sockfd, (struct sockaddr *)&cli,(socklen_t*) &len); 
+        ssl = SSL_new(ctx);
+        client->ssl = ssl;
+        client->fd = connfd;
+        SSL_set_fd(ssl, connfd);
+        check = SSL_accept(ssl);
+
+        if (connfd < 0) { 
+            printf("Server accept failed...\n"); 
+            exit(0); 
+        } 
+        else{
+            if(check == 1){
+                printf("server accept the client...\n");
+                pthread_t pthread;
+                pthread_create(&pthread,NULL,receiveCommand,client);
+
+            }
+            else{
+                printf("Problème lié a ssl abandon du client\n");
+                close(connfd);
+                SSL_free(ssl);
+
+    
+            }
+
+
+        }
+
     }
 
     

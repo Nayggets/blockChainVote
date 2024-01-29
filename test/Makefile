@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=`pkg-config --cflags glib-2.0 sqlite3`
-LIBS=`pkg-config --libs glib-2.0 sqlite3`  -lsqlite3 -pthread -lgmp -g
+CFLAGS=`pkg-config --cflags glib-2.0 sqlite3` -lssl -lcrypto
+LIBS=`pkg-config --libs glib-2.0 sqlite3` -lsqlite3  -pthread -lgmp -g -lcrypto -lssl 
 BUILDDIR=../build
 PROJECTLIBDIR=-L../build/lib
 PROJECTLIB=-lvoting
@@ -9,8 +9,6 @@ PROJECTLIB=-lvoting
 $(shell mkdir -p $(BUILDDIR))
 
 all: $(BUILDDIR)/test_electeur $(BUILDDIR)/test_election $(BUILDDIR)/testsqlite $(BUILDDIR)/test_creation_electeur $(BUILDDIR)/server_test $(BUILDDIR)/test_crypto.bin $(BUILDDIR)/test_vote
-
-
 
 $(BUILDDIR)/test_electeur: test_electeur.c
 	$(CC) test_electeur.c $(CFLAGS) $(PROJECTLIBDIR) $(PROJECTLIB) $(LIBS) -o $(BUILDDIR)/test_electeur
