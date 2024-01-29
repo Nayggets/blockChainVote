@@ -10,7 +10,7 @@ int handlercastvote(sqlite3 *db, Commande *cmd) {
     char* idElection = cmd->commande.castVote.idElection;
     if (electeurExists(db, id, strlen(id) + 1) == 0 && electionExists(db, idElection, strlen(idElection) + 1) == 0)
     {
-        Election_castVote(db, id, idElection, cmd->commande.castVote.ballot, cmd->commande.castVote.ballotSize, 1);
+        Election_castVote(db, id, idElection, cmd->commande.castVote.ballot, cmd->commande.castVote.ballotSize, cmd->commande.castVote.hashValidation);
         return 0;
     }
     return -1;

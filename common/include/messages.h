@@ -24,6 +24,7 @@ typedef struct
     char idElection[ENTITY_ID_SIZE];
     const void *ballot;
     size_t ballotSize;
+    const char* hashValidation[256];
 } CastVoteCmd;
 
 typedef struct
