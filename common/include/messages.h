@@ -77,11 +77,11 @@ typedef enum
     CAST_VOTE,
     UPDATE_ELECTEUR,
     READ_ELECTEUR,
-    AjoutElectionCmd,
-    SupprimeElectionCmd,
-    UpdateElectionCmd,
-    ReadElecteurCmd,
-    ProcessVotesCmd
+    AJOUT_ELECTION,
+    SUPPRIME_ELECTION,
+    UPDATE_ELECTION,
+    READ_ELECTION,
+    PROCESS_VOTES
 } CommandType;
 
 //--
@@ -101,7 +101,7 @@ typedef struct
         SupprimeElectionCmd supprimeElection;
         UpdateElectionCmd updateElection;
         ReadElectionCmd readElection;
-        ProcessElectionCmd processVotes;
+        ProcessVotesCmd processVotes;
     } commande;
 } Commande;
 
