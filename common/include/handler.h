@@ -8,11 +8,14 @@
 #include <glib.h>
 
 
-int handlerestpresent(sqlite3 *db,Commande* cmd);
 
 int handlerajoutelecteur(sqlite3 *db, Commande *cmd);
 
+int handlerestpresent(sqlite3 *db,Commande* cmd);
+
 int handlersupprimeElecteur(sqlite3 *db, Commande* cmd);
+
+int handlercastvote(sqlite3 *db, Commande *cmd);
 
 int handlerupdateelecteur(sqlite3 *db, Commande* cmd);
 
@@ -26,4 +29,5 @@ int handlerUpdateElection(sqlite3 *db, Commande *cmd);
 
 int handlerReadElection(sqlite3 *db, Commande *cmd);
 
-int handlercastvote(sqlite3 *db, Commande *cmd)
+
+#endif

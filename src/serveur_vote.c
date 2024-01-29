@@ -44,7 +44,6 @@ void* receiveCommand(void* data)
     client_fd* client = data;
     int size = sizeof(Commande);
     char buff[sizeof(Commande)];
-    size = SSL_read(client->ssl,buff,size);
     while(size == sizeof(Commande)){
         Commande* commande;
         commande = (Commande*)&buff[0];
@@ -130,8 +129,7 @@ void launch(void* data)
         client = malloc(sizeof(client_fd));
         connfd = accept(sockfd, (struct sockaddr *)&cli,(socklen_t*) &len); 
         ssl = SSL_new(ctx);
-        client->ssl = ssl;
-        client->fd = connfd;
+
         SSL_set_fd(ssl, connfd);
         check = SSL_accept(ssl);
 
@@ -141,6 +139,8 @@ void launch(void* data)
         } 
         else{
             if(check == 1){
+                client->ssl = ssl;
+                client->fd = connfd;
                 printf("server accept the client...\n");
                 pthread_t pthread;
                 pthread_create(&pthread,NULL,receiveCommand,client);
@@ -237,7 +237,22 @@ void* worker(void* data)
             }
             break;
         case CAST_VOTE:
+        /*
+            if(handlercastvote(db,commande) == 0){
+                printf("Vote a fonctionner\n");
+            }
+            else{
+                printf("Error lors du vote\n");
+            }
+            */
             break;
+        case AJOUT_ELECTION:
+            if(handlerAjoutelection(db,commande) == 0){
+                printf("Election creer avec succès\n");
+            } 
+            else{
+                printf("Error lors de la creation d'election\n");
+            }
         default:
             printf("Commande inconnu abandon du traitement.\n");
             break;

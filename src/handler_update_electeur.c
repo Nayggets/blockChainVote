@@ -9,8 +9,8 @@ int handlerupdateelecteur(sqlite3 *db, Commande *cmd) {
     char *id = cmd->commande.updateElecteur.identifiant;
     if (electeurExists(db, id, strlen(id) + 1) == 0)
     {
-        newId= cmd->commande.updateElecteur.newId;
-        updateElecteur(db, id, strlen(id)+1, newId,strlen(newId)+1);
+        
+        updateElecteur(db, id, strlen(id)+1, cmd->commande.updateElecteur.newId,strlen(cmd->commande.updateElecteur.newId)+1);
         printf("Electeur mis a jour");
         return 0;
     }
