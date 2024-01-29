@@ -1,5 +1,8 @@
 
-#include "handler.h"
+#include "../common/include/handler.h"
+#include <stdio.h>
+#include "../common/include/messages.h"
+#include "../common/include/bd.h"
 
 int handlersupprimeElecteur(sqlite3 *db, Commande* cmd) {
     char id=cmd->commande.supprimeElecteur.identifiant;
