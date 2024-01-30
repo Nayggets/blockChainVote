@@ -29,5 +29,4 @@ int handlerUpdateElection(sqlite3 *db, Commande *cmd);
 
 int handlerReadElection(sqlite3 *db, Commande *cmd);
 
-
 #endif

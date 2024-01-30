@@ -2,7 +2,7 @@
 #define MESSAGE_H
 #include <aio.h>
 #include "protocol.h"
-
+#include <openssl/ssl.h>
 typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
@@ -105,4 +105,16 @@ typedef struct
     } commande;
 } Commande;
 
+typedef struct client_fd
+{
+    int fd;
+    SSL* ssl;
+} client_fd;
+
+
+typedef struct 
+{
+    Commande* commande;
+    client_fd* client;
+} task_commande;
 #endif

@@ -34,11 +34,6 @@ void* worker(void*);
 int fillCommand(Commande commande);
 
 
-typedef struct client_fd
-{
-    int fd;
-    SSL* ssl;
-} client_fd;
 
 void* receiveCommand(void* data)
 {
@@ -248,7 +243,22 @@ void* worker(void* data)
             else{
                 printf("Error lors du vote\n");
             }
-            
+            break;
+        case UPDATE_ELECTEUR:
+            if(handlerupdateelecteur(db,commande) == 0){
+                printf("Update a fonctionner\n");
+            }
+            else{
+                printf("Error lors de l'update\n");
+            }
+            break;
+        case READ_ELECTEUR:
+            if(handlerReadElecteur(db,commande) == 0){
+                printf("Read election\n");
+            }
+            else{
+                printf("Error lors du read\n");
+            }
             break;
         case AJOUT_ELECTION:
             if(handlerAjoutelection(db,commande) == 0){
@@ -257,6 +267,34 @@ void* worker(void* data)
             else{
                 printf("Error lors de la creation d'election\n");
             }
+            break;
+        case SUPPRIME_ELECTION:
+            if(handlerSupprimeElection(db,commande) == 0){
+                printf("Supprimer Election\n");
+            }
+            else{
+                printf("Supprimer election\n");
+            }
+            break;
+        case UPDATE_ELECTION:
+            if(handlerUpdateElection(db,commande)){
+                printf("Update Election\n");
+            }
+            else{
+                printf("Update Election\n");
+            }
+            break;
+        case READ_ELECTION:
+            if(handlerReadElection(db,commande)){
+                printf("Read election\n");
+            }
+            else{
+                printf("Read election\n");
+            }
+            break;
+        case PROCESS_VOTES:
+            //if()
+
             break;
         default:
             printf("Commande inconnu abandon du traitement.\n");
