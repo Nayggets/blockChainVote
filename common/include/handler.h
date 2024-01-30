@@ -25,6 +25,7 @@ CodeErreur handlerAjoutelection(sqlite3 *db, Commande *cmd);
 
 CodeErreur handlerSupprimeElection(sqlite3 *db, Commande *cmd);
 
+<<<<<<< HEAD
 CodeErreur handlerUpdateElection(sqlite3 *db, Commande *cmd);
 
 CodeErreur handlerReadElection(sqlite3 *db, Commande *cmd);
@@ -33,4 +34,8 @@ int handlercastvote(sqlite3 *db, Commande *cmd);
 
 int handlerUpdateStatus(sqlite3 *db, Commande *cmd);
 
+=======
+int handlercastvote(sqlite3 *db, Commande *cmd);
+
+>>>>>>> 3f75a2aaf09d93163cd3656a6ebd3a7cdd191703
 #endif
