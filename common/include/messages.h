@@ -84,6 +84,15 @@ typedef enum
     PROCESS_VOTES
 } CommandType;
 
+
+typedef enum
+{
+   REUSSITE = 0,
+   ELECTEUR_PAS_PRESENT = 1,
+   ElECTION_EXISTE_DEJA = 2,
+   ElECTION_PAS_PRESENTE = 3,
+} CodeErreur;
+
 //--
 typedef struct
 {

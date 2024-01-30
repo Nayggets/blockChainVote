@@ -3,6 +3,7 @@
         "handler.h": "c",
         "stdio.h": "c",
         "votechain.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "messages.h": "c"
     }
 }
