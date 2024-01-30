@@ -31,4 +31,6 @@ CodeErreur handlerReadElection(sqlite3 *db, Commande *cmd);
 
 int handlercastvote(sqlite3 *db, Commande *cmd);
 
+int handlerUpdateStatus(sqlite3 *db, Commande *cmd);
+
 #endif
