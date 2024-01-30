@@ -450,6 +450,11 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
     unsigned int valueTotal = mpz_get_ui(total);
     printf("Decrypted value %d\n",valueTotal);
 
+    *p_option1 = valueTotal;
+    *p_option0 = *p_totalvotes - valueTotal;
+    
+
+    /* valeur de l'ancien temps
     float divide = (float) valueTotal / *p_totalvotes;
     printf("Decrypted value %f\n",divide);
 
@@ -464,6 +469,7 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
         *p_option1 = 1;
         *p_option0 = 1;
     }
+    */
 }
 
 // Pour cancel, il suffit de mettre 'canceled' dans le champ 'status'

@@ -5,14 +5,14 @@
 #include "../common/include/bd.h"
 
 // Fonction pour mettre a jour une election
-int handlerUpdateElection(sqlite3 *db, Commande *cmd) {
+CodeErreur handlerUpdateElection(sqlite3 *db, Commande *cmd) {
     char* id = cmd->commande.updateElection.identifiant;
     int realid = Election_getIdFromNumeroID(db, id, strlen(id)+1);
     if (realid > 0)
     {
         updateElection(db, realid, cmd->commande.updateElection.question);
         printf("Election mise a jour");
-        return 0;
+        return REUSSITE;
     }
-    return -1;
+    return ElECTION_PAS_PRESENTE;
 }
