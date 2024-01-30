@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
 
 const char *electeur_create = "CREATE TABLE IF NOT EXISTS Electeur(id INTEGER PRIMARY KEY, numeroID BLOB);";
 
@@ -470,3 +471,57 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
     }
     */
 }
+
+// Pour cancel, il suffit de mettre 'canceled' dans le champ 'status'
+void updateStatus(sqlite3 *db, int id, const char *status)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "UPDATE Election SET status = ? WHERE id = ?;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_text(stmt, 1, status, -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 2, id);
+
+        if (sqlite3_step(stmt) != SQLITE_DONE)
+        {
+            fprintf(stderr, "Erreur lors de la mise à jour: %s\n", sqlite3_errmsg(db));
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+}
+
+void detectIfEnded(sqlite3 *db)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT id,dateFin,status FROM Election;";
+    
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char date[20];
+    sprintf(date, "%d/%d/%d", tm.tm_mday + 1900, tm.tm_mon + 1, tm.tm_year);
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            if(strcmp(sqlite3_column_text(stmt, 1),"") != 0){
+                char* dateFin = sqlite3_column_text(stmt, 2);
+                if(strcmp(dateFin,date) == 0){
+                    updateStatus(db,sqlite3_column_int(stmt, 0),"closed");}
+            }
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+}
+
