@@ -286,9 +286,10 @@ int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size)
 }
 
 // TODO
-void readElection(sqlite3 *db, int id)
+char *readElection(sqlite3 *db, int id)
 {
     sqlite3_stmt *stmt;
+    char *result = NULL;
     const char *sql = "SELECT * FROM Election WHERE id = ?;";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
@@ -297,14 +298,18 @@ void readElection(sqlite3 *db, int id)
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            printf("%s\n", sqlite3_column_text(stmt, 2)); // Pour la colonne 'question'
+            //printf("%s\n", sqlite3_column_text(stmt, 2));
+            sprintf(result, "%s", sqlite3_column_text(stmt, 2));
+
         }
 
         sqlite3_finalize(stmt);
+        return result;
     }
     else
     {
         fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+        return NULL;
     }
 }
 
@@ -353,7 +358,7 @@ void deleteElection(sqlite3 *db, int id)
     }
 }
 
-void readElection(sqlite3 *db, int id, size_t size)
+void readElection(sqlite3 *db, int id)
 {
     sqlite3_stmt *stmt;
     const char *sql = "SELECT * FROM Election WHERE id = ?;";
@@ -471,18 +476,8 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
     unsigned int valueTotal = mpz_get_ui(total);
     printf("Decrypted value %d\n",valueTotal);
 
-    float divide = (float) valueTotal / *p_totalvotes;
-    printf("Decrypted value %f\n",divide);
+    *p_option0 = valueTotal;
+    *p_option1 = *p_totalvotes - *p_option0;
 
-    if(divide > 0.5){
-        *p_option0 = 1;
 
-    }
-    else if(divide < 0.5){
-        *p_option1 = 1;
-    }
-    else{
-        *p_option1 = 1;
-        *p_option0 = 1;
-    }
 }
