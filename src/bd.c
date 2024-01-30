@@ -141,7 +141,7 @@ int electeurExists(sqlite3 *db, const char *numeroID, int size)
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
             result = sqlite3_column_int(stmt, 0) > 0;
-            printf("result electeur exists %i and value %d",result,sqlite3_column_int(stmt, 0));
+           // printf("result electeur exists %i and value %d",result,sqlite3_column_int(stmt, 0));
         }
 
         sqlite3_finalize(stmt);
@@ -343,6 +343,28 @@ void deleteElection(sqlite3 *db, int id)
         if (sqlite3_step(stmt) != SQLITE_DONE)
         {
             fprintf(stderr, "Erreur lors de la suppression: %s\n", sqlite3_errmsg(db));
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+}
+
+void readElection(sqlite3 *db, int id, size_t size)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT * FROM Election WHERE id = ?;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, id);
+
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            printf("%s\n", sqlite3_column_text(stmt, 2)); // Pour la colonne 'question'
         }
 
         sqlite3_finalize(stmt);

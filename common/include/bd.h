@@ -19,6 +19,7 @@ int getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size);
 // usecases election
 void createElection(sqlite3 *db, const char *identifiant, int sizeId, const char *question, const char *dateDebut, const char *dateFin, const char *status);
 void updateElection(sqlite3 *db, int id, const char *question);
+void readElection(sqlite3 *db, int id, size_t size);
 int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size);
 
 void Election_castVote(sqlite3 *db, int idVotant, int idElection, const void *ballot, int ballotSize, const char *hashValidation);
