@@ -214,10 +214,12 @@ void* worker(void* data)
     while(1){
         Commande* commande = accessCommand();
         printf("Traitement Commande %d\n",commande->type);
+        int code;
         switch (commande->type)
         {
         case AJOUT_ELECTEUR:
-            if(handlerajoutelecteur(db,commande) == 0){
+            code = handlerajoutelecteur(db,commande);
+            if(code == 0){
                 printf("Electeur ajouter\n");
             }
             else{
@@ -225,7 +227,8 @@ void* worker(void* data)
             }
             break;
         case SUPPRIME_ELECTEUR:
-            if(handlersupprimeElecteur(db,commande) == 0){
+            code = handlersupprimeElecteur(db,commande);
+            if(code == 0){
                 printf("Electeur supprimer\n");
             }
             else{
@@ -233,7 +236,8 @@ void* worker(void* data)
             }
             break;
         case EST_PRESENT:
-            if(handlerestpresent(db,commande) == 0){
+            code = handlerestpresent(db,commande);
+            if(code == 0){
                 printf("Electeur est present\n");
             }
             else{
@@ -241,8 +245,8 @@ void* worker(void* data)
             }
             break;
         case CAST_VOTE:
-        
-            if(handlercastvote(db,commande) == 0){
+            code = handlercastvote(db,commande);
+            if(code == 0){
                 printf("Vote a fonctionner\n");
             }
             else{
@@ -251,7 +255,8 @@ void* worker(void* data)
             
             break;
         case AJOUT_ELECTION:
-            if(handlerAjoutelection(db,commande) == 0){
+            code = handlerAjoutelection(db,commande);
+            if(code == 0){
                 printf("Election creer avec succès\n");
             } 
             else{
