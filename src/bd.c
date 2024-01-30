@@ -528,29 +528,3 @@ void detectIfEnded(sqlite3 *db)
         sleep(500);
     }
 }
-
-void deleteElection(sqlite3 *db, const char *identifiant, int size)
-{
-    sqlite3_stmt *stmt;
-    const char *sql = "DELETE FROM Election WHERE identifiant = ?;";
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
-    {
-        sqlite3_bind_blob(stmt, 1, identifiant, size, SQLITE_STATIC);
-
-        if (sqlite3_step(stmt) != SQLITE_DONE)
-        {
-            printf("Erreur lors de la suppression: %s\n", sqlite3_errmsg(db));
-        }
-        else
-        {
-            printf("Election supprimée avec succès\n");
-        }
-
-        sqlite3_finalize(stmt);
-    }
-    else
-    {
-        printf("Erreur de préparation: %s\n", sqlite3_errmsg(db));
-    }
-}

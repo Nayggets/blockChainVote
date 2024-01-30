@@ -1,6 +1,6 @@
 #include "../common/include/handler.h"
 
-int handlersupprimeElecteur(sqlite3 *db, Commande* cmd) {
+int handlerUpdateStatus(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.updateStatus.identifiant;
     int realId = Election_getIdFromNumeroID(db, id, strlen(id));
     if(id=!-1){
