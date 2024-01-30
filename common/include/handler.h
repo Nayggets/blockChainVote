@@ -29,5 +29,6 @@ CodeErreur handlerUpdateElection(sqlite3 *db, Commande *cmd);
 
 CodeErreur handlerReadElection(sqlite3 *db, Commande *cmd);
 
+int handlercastvote(sqlite3 *db, Commande *cmd);
 
 #endif
