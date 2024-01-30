@@ -9,6 +9,7 @@ CodeErreur handlerReadElection(sqlite3 *db, Commande* cmd) {
     if(Election_getIdFromNumeroID(db, id, strlen(id)+1)){
         readElection(db, id, strlen(id)+1);
         return 0;
+    }
     if(Election_getIdFromNumeroID(db, id, strlen(id))){
         readElection(db, id, strlen(id));
         return REUSSITE;
