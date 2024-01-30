@@ -25,13 +25,13 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_cond_t cond2 = PTHREAD_COND_INITIALIZER;
 mpz_t n, lambda, g, mu;
-Commande commandes[256];
+task_commande commandes[256];
 int index_commandes = 0;
 const int PORT = 8888;
 
 
 void* worker(void*);
-int fillCommand(Commande commande);
+int fillCommand(task_commande commande);
 
 
 
@@ -39,12 +39,13 @@ void* receiveCommand(void* data)
 {
     client_fd* client = data;
     int size = sizeof(Commande);
-    char buff[sizeof(Commande)];
+    Commande commande;
     while(size == sizeof(Commande)){
-        Commande* commande;
-        commande = (Commande*)&buff[0];
-        fillCommand(*commande);
-        size = SSL_read(client->ssl,buff,size);
+        task_commande task_commande;
+        task_commande.commande = commande;
+        task_commande.client = client;
+        fillCommand(task_commande);
+        size = SSL_read(client->ssl,&commande,size);
 
     }
     printf("Client left\n");
@@ -161,14 +162,14 @@ void launch(void* data)
     
 }
 
-int fillCommand(Commande commande)
+int fillCommand(task_commande commande)
 {
     pthread_mutex_lock(&mutex);
     if(index_commandes >= 256){
         pthread_cond_wait(&cond2,&mutex);
     }
-    memcpy(&commandes[index_commandes],&commande,sizeof(Commande));
-    printf("commandes ajouté avec succès type = %d",commandes[index_commandes].type);
+    memcpy(&commandes[index_commandes],&commande,sizeof(task_commande));
+    printf("commandes ajouté avec succès type = %d",commandes[index_commandes].commande.type);
     index_commandes++;
     pthread_cond_signal(&cond);  
 
@@ -176,18 +177,17 @@ int fillCommand(Commande commande)
 
 }
 
-Commande* accessCommand()
+task_commande* accessCommand()
 {
     printf("\nCommande debut recuperation %d\n",index_commandes);
 
     pthread_mutex_lock(&mutex);
     if(index_commandes == 0){
         pthread_cond_wait(&cond,&mutex);
-
     }
-    Commande* commande = malloc(sizeof(Commande));
-    printf("Taille de commande %ld\n",sizeof(Commande));
-    memcpy(commande,&commandes[index_commandes-1],sizeof(Commande));
+    task_commande* commande = malloc(sizeof(task_commande));
+    printf("Taille de commande %ld\n",sizeof(task_commande));
+    memcpy(commande,&commandes[index_commandes-1],sizeof(task_commande));
     index_commandes--;
     pthread_cond_signal(&cond2);
     pthread_mutex_unlock(&mutex);
@@ -207,13 +207,13 @@ void* worker(void* data)
     printf("worker lancer\n");
 
     while(1){
-        Commande* commande = accessCommand();
-        printf("Traitement Commande %d\n",commande->type);
+        task_commande* task_commande = accessCommand();
+        printf("Traitement Commande %d\n",task_commande->commande.type);
         int code;
-        switch (commande->type)
+        switch (task_commande->commande.type)
         {
         case AJOUT_ELECTEUR:
-            code = handlerajoutelecteur(db,commande);
+            code = handlerajoutelecteur(db,&task_commande->commande);
             if(code == 0){
                 printf("Electeur ajouter\n");
             }
@@ -222,7 +222,7 @@ void* worker(void* data)
             }
             break;
         case SUPPRIME_ELECTEUR:
-            code = handlersupprimeElecteur(db,commande);
+            code = handlersupprimeElecteur(db,&task_commande->commande);
             if(code == 0){
                 printf("Electeur supprimer\n");
             }
@@ -231,7 +231,7 @@ void* worker(void* data)
             }
             break;
         case EST_PRESENT:
-            code = handlerestpresent(db,commande);
+            code = handlerestpresent(db,&task_commande->commande);
             if(code == 0){
                 printf("Electeur est present\n");
             }
@@ -240,7 +240,7 @@ void* worker(void* data)
             }
             break;
         case CAST_VOTE:
-            code = handlercastvote(db,commande);
+            code = handlercastvote(db,&task_commande->commande);
             if(code == 0){
                 printf("Vote a fonctionner\n");
             }
@@ -249,7 +249,7 @@ void* worker(void* data)
             }
             break;
         case UPDATE_ELECTEUR:
-            if(handlerupdateelecteur(db,commande) == 0){
+            if(handlerupdateelecteur(db,&task_commande->commande) == 0){
                 printf("Update a fonctionner\n");
             }
             else{
@@ -257,7 +257,7 @@ void* worker(void* data)
             }
             break;
         case READ_ELECTEUR:
-            if(handlerReadElecteur(db,commande) == 0){
+            if(handlerReadElecteur(db,&task_commande->commande) == 0){
                 printf("Read election\n");
             }
             else{
@@ -265,7 +265,7 @@ void* worker(void* data)
             }
             break;
         case AJOUT_ELECTION:
-            code = handlerAjoutelection(db,commande);
+            code = handlerAjoutelection(db,&task_commande->commande);
             if(code == 0){
                 printf("Election creer avec succès\n");
             } 
@@ -274,7 +274,7 @@ void* worker(void* data)
             }
             break;
         case SUPPRIME_ELECTION:
-            if(handlerSupprimeElection(db,commande) == 0){
+            if(handlerSupprimeElection(db,&task_commande->commande) == 0){
                 printf("Supprimer Election\n");
             }
             else{
@@ -282,7 +282,7 @@ void* worker(void* data)
             }
             break;
         case UPDATE_ELECTION:
-            if(handlerUpdateElection(db,commande)){
+            if(handlerUpdateElection(db,&task_commande->commande)){
                 printf("Update Election\n");
             }
             else{
@@ -290,7 +290,7 @@ void* worker(void* data)
             }
             break;
         case READ_ELECTION:
-            if(handlerReadElection(db,commande)){
+            if(handlerReadElection(db,&task_commande->commande)){
                 printf("Read election\n");
             }
             else{
@@ -305,6 +305,6 @@ void* worker(void* data)
             printf("Commande inconnu abandon du traitement.\n");
             break;
         }
-        free(commande);
+        free(task_commande);
     }
 }

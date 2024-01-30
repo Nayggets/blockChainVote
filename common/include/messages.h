@@ -1,5 +1,5 @@
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#ifndef __MESSAGE_H
+#define __MESSAGE_H
 #include <aio.h>
 #include "protocol.h"
 #include <openssl/ssl.h>
@@ -123,7 +123,7 @@ typedef struct client_fd
 
 typedef struct 
 {
-    Commande* commande;
+    Commande commande;
     client_fd* client;
 } task_commande;
 #endif
