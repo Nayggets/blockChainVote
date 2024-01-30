@@ -2,6 +2,7 @@
 #define MESSAGE_H
 #include <aio.h>
 #include "protocol.h"
+#include <gmp.h>
 
 typedef struct
 {
@@ -64,7 +65,14 @@ typedef struct
 
 typedef struct
 {
-    char identifiant[ENTITY_ID_SIZE];
+    char identifiantElection[ENTITY_ID_SIZE];
+    char option0[256];
+    char option1[256];
+    int* totalVotes;
+    mpz_t g;
+    mpz_t lambda;
+    mpz_t mu;
+    mpz_t n;
 } ProcessVotesCmd;
 
 typedef struct
