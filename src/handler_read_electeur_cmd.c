@@ -4,12 +4,12 @@
 #include "../common/include/messages.h"
 #include "../common/include/bd.h"
 
-int handlerReadElecteur(sqlite3 *db, Commande* cmd) {
+CodeErreur handlerReadElecteur(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.readElecteur.identifiant;
     if(electeurExists(db, id, strlen(id))){
         readElecteur(db, id, strlen(id));
-        return 0;
+        return REUSSITE;
     } else {
-        return -1;
+        return ELECTEUR_PAS_PRESENT;
     }
 }
