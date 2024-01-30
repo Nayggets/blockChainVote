@@ -142,6 +142,7 @@ int electeurExists(sqlite3 *db, const char *numeroID, int size)
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
             result = sqlite3_column_int(stmt, 0) > 0;
+            printf("result electeur exists %i and value %d",result,sqlite3_column_int(stmt, 0));
         }
 
         sqlite3_finalize(stmt);
@@ -271,6 +272,8 @@ int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size)
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
             id = sqlite3_column_int(stmt, 0); // Récupère l'ID de la première colonne
+            printf("id election exists %i",id);
+
         }
 
         sqlite3_finalize(stmt);
@@ -489,30 +492,34 @@ void updateStatus(sqlite3 *db, int id, const char *status)
 
 void detectIfEnded(sqlite3 *db)
 {
-    sqlite3_stmt *stmt;
-    const char *sql = "SELECT id,dateFin,status FROM Election;";
+    while (1)
+    {
+        sqlite3_stmt *stmt;
+        const char *sql = "SELECT id,dateFin,status FROM Election;";
     
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    char date[20];
-    sprintf(date, "%d/%d/%d", tm.tm_mday + 1900, tm.tm_mon + 1, tm.tm_year);
+        time_t t = time(NULL);
+        struct tm tm = *localtime(&t);
+        char date[20];
+        sprintf(date, "%d/%d/%d", tm.tm_mday + 1900, tm.tm_mon + 1, tm.tm_year);
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
-    {
-        while (sqlite3_step(stmt) == SQLITE_ROW)
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
         {
-            if(strcmp(sqlite3_column_text(stmt, 1),"") != 0){
-                char* dateFin = sqlite3_column_text(stmt, 2);
-                if(strcmp(dateFin,date) == 0){
-                    updateStatus(db,sqlite3_column_int(stmt, 0),"closed");}
+            while (sqlite3_step(stmt) == SQLITE_ROW)
+            {
+                if(strcmp(sqlite3_column_text(stmt, 1),"") != 0){
+                    char* dateFin = sqlite3_column_text(stmt, 2);
+                    if(strcmp(dateFin,date) == 0){
+                        updateStatus(db,sqlite3_column_int(stmt, 0),"closed");}
+                }
             }
-        }
 
-        sqlite3_finalize(stmt);
-    }
-    else
-    {
-        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+            sqlite3_finalize(stmt);
+        }
+        else
+        {
+            fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+        }
+        sleep(500);
     }
 }
 
