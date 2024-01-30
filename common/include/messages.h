@@ -120,6 +120,12 @@ typedef struct client_fd
     SSL* ssl;
 } client_fd;
 
+typedef struct 
+{
+    CodeErreur codeErreur;
+    Commande command;
+    char[256] message;
+}paquets;
 
 typedef struct 
 {

@@ -197,7 +197,94 @@ Commande* accessCommand()
 }
 
 
+void chaine_err(CommandType code_action,CodeErreur code_erreur,char* chaine_a_remplir)
+{
+  if(code_action == AJOUT_ELECTEUR && code_erreur == REUSSITE){
+    strcpy(chaine_a_remplir,"Reussite lors de l'ajout de l'electeur");
+  }
+  else if (code_action == AJOUT_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de l'ajout de l'electeur");
+  }
+  else if (code_action == SUPPRIME_ELECTEUR && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la suppression");
+  }
+  else if (code_action == SUPPRIME_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la suppression de l'electeur");
+  }
+  else if (code_action == EST_PRESENT && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la vérification de la présence de l'electeur");
+  }
+  else if (code_action == EST_PRESENT && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la vérification de la présence de l'electeur");
+  } 
+  else if (code_action == CAST_VOTE && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de l'ajout de l'electeur à l'election");
+  }
+  else if (code_action == CAST_VOTE && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec l'électeur n'est pas présent");
+  }
+  else if (code_action == CAST_VOTE && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec l'élection n'est pas présente");
+  }
+  else if (code_action == UPDATE_ELECTEUR && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la mise a jour de l'electeur");
+  }
+  else if (code_action == UPDATE_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la mise a jour de l'electeur");
+  }
+  else if (code_action == READ_ELECTEUR && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors du read");
+  }
+  else if (code_action == READ_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors du read");
+  }
+  else if (code_action == AJOUT_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de l'ajout de l'election");
+  }
+  else if (code_action == AJOUT_ELECTION && code_erreur == ElECTION_EXISTE_DEJA)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de l'ajout de l'election");
+  }
+  else if (code_action == SUPPRIME_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la suppression de l'élection");
+  }
+  else if (code_action == SUPPRIME_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la suppression de l'élection");
+  }
+  else if (code_action == UPDATE_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la mise à jour de l'élection");
+  }
+  else if (code_action == UPDATE_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la mise à jour de l'élection");
+  }
+  else if (code_action == READ_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors du read de l'election");
+  }
+  else if (code_action == READ_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec lors du read de l'election");
+  }
+// reste proccesss vote a faire mais j'ai pas le handler ducoup
 
+}
 
 
 void* worker(void* data)
@@ -214,86 +301,111 @@ void* worker(void* data)
         {
         case AJOUT_ELECTEUR:
             code = handlerajoutelecteur(db,commande);
-            if(code == 0){
+            if(code == REUSSITE){
+                chaine_err(AJOUT_ELECTEUR,code,"Super !");
                 printf("Electeur ajouter\n");
             }
             else{
+                chaine_err(AJOUT_ELECTEUR,code,"il manque un electeur");
                 printf("Error lors de l'ajout");
             }
             break;
         case SUPPRIME_ELECTEUR:
             code = handlersupprimeElecteur(db,commande);
-            if(code == 0){
+            if(code == REUSSITE){
+                chaine_err(SUPPRIME_ELECTEUR,code,"Super !");
                 printf("Electeur supprimer\n");
             }
             else{
+                chaine_err(SUPPRIME_ELECTEUR,code,"Il manque un electeur ");
                 printf("Error lors de la suppression");
             }
             break;
         case EST_PRESENT:
             code = handlerestpresent(db,commande);
-            if(code == 0){
+            if(code == REUSSITE){
+                chaine_err(EST_PRESENT,code,"Super !");
                 printf("Electeur est present\n");
             }
             else{
+                chaine_err(EST_PRESENT,code,"Il manque un electeur");
                 printf("Error lors du check est present");
             }
             break;
         case CAST_VOTE:
             code = handlercastvote(db,commande);
-            if(code == 0){
+            if(code == REUSSITE){
+                chaine_err(CAST_VOTE,code,"Super !");
                 printf("Vote a fonctionner\n");
             }
             else{
+                chaine_err(CAST_VOTE,code,"Erreur !");
                 printf("Error lors du vote\n");
             }
             break;
         case UPDATE_ELECTEUR:
-            if(handlerupdateelecteur(db,commande) == 0){
+            code = handlerupdateelecteur(db,commande);
+            if(code == REUSSITE){
+                chaine_err(UPDATE_ELECTEUR,code,"Super !");
                 printf("Update a fonctionner\n");
             }
             else{
+                chaine_err(UPDATE_ELECTEUR,code,"l'électeur n'éxiste pas");
                 printf("Error lors de l'update\n");
             }
             break;
         case READ_ELECTEUR:
-            if(handlerReadElecteur(db,commande) == 0){
+            code = handlerReadElecteur(db,commande);
+            if(code == REUSSITE){
+                chaine_err(READ_ELECTEUR,code,"Super !");
                 printf("Read election\n");
             }
             else{
+                chaine_err(READ_ELECTEUR,code,"L'électeur n'éxiste pas");
                 printf("Error lors du read\n");
             }
             break;
         case AJOUT_ELECTION:
             code = handlerAjoutelection(db,commande);
-            if(code == 0){
+            if(code == REUSSITE){
+                chaine_err(AJOUT_ELECTION,code,"Super !");
                 printf("Election creer avec succès\n");
             } 
             else{
+                chaine_err(AJOUT_ELECTION,code,"L'élection n'éxiste pas ");
                 printf("Error lors de la creation d'election\n");
             }
             break;
         case SUPPRIME_ELECTION:
-            if(handlerSupprimeElection(db,commande) == 0){
+            code = handlerSupprimeElection(db,commande);
+            if(code == REUSSITE){
+                chaine_err(SUPPRIME_ELECTION,code,"Super !");
                 printf("Supprimer Election\n");
             }
             else{
+                chaine_err(SUPPRIME_ELECTION,code,"L'élection n'éxiste pas ");
                 printf("Supprimer election\n");
             }
             break;
         case UPDATE_ELECTION:
-            if(handlerUpdateElection(db,commande)){
+            code = handlerUpdateElection(db,commande);
+            if(code == REUSSITE){
+                chaine_err(UPDATE_ELECTION,code,"Super !");
                 printf("Update Election\n");
             }
             else{
+                chaine_err(UPDATE_ELECTION,code,"L'élection n'éxiste pas ");
                 printf("Update Election\n");
             }
             break;
         case READ_ELECTION:
-            if(handlerReadElection(db,commande)){
+            code =handlerReadElection(db,commande);
+            if(code == REUSSITE){
+                chaine_err(READ_ELECTION,code,"Super !");
                 printf("Read election\n");
             }
             else{
+                chaine_err(READ_ELECTION,code,"L'élection n'éxiste pas ");
                 printf("Read election\n");
             }
             break;
