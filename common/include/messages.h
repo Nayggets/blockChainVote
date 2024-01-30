@@ -2,7 +2,7 @@
 #define MESSAGE_H
 #include <aio.h>
 #include "protocol.h"
-
+#include <openssl/ssl.h>
 typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
@@ -22,7 +22,7 @@ typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
     char idElection[ENTITY_ID_SIZE];
-    const void *ballot;
+    int ballot;
     size_t ballotSize;
 } CastVoteCmd;
 
@@ -43,7 +43,7 @@ typedef struct
     char question[256];
     char dateDebut[256];
     char dateFin[256];
-    const char *status[256];
+    char status[256];
 } AjoutElectionCmd;
 
 typedef struct
@@ -105,4 +105,16 @@ typedef struct
     } commande;
 } Commande;
 
+typedef struct client_fd
+{
+    int fd;
+    SSL* ssl;
+} client_fd;
+
+
+typedef struct 
+{
+    Commande* commande;
+    client_fd* client;
+} task_commande;
 #endif

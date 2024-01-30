@@ -21,11 +21,141 @@ SSL_CTX* init_ssl_context() {
     return ctx;
 }
 
-#define QUIT 5
-#define CREERELECTOR 1
-#define SUPPRIMERELECTEUR 2
-#define VOTEELECTEUR 3
-#define CLOREVOTE 4
+#define QUIT 20
+
+int actual_year()
+{
+    time_t seconds=time(NULL);
+    struct tm* current_time=localtime(&seconds); 
+    
+    return (current_time->tm_year + 1900);
+}
+
+int bissextile(int an)
+{
+   if (an%400==0) return 1;
+   if (an%100==0) return 0;
+   if (an%4==0) return 1;
+   return 0;
+}
+
+int longueur_mois(int m,int a)
+{
+    switch(m)
+    {
+    case 1: return 31;
+    case 2:
+         if (bissextile(a))
+         return 29;
+         else
+         return 28;
+    case 3: return 31;
+    case 4: return 30;
+    case 5: return 31;
+    case 6: return 30;
+    case 7: return 31;
+    case 8: return 31;
+    case 9: return 30;
+    case 10: return 31;
+    case 11: return 30;
+    case 12: return 31;
+    default: return 0;
+    }
+}
+
+int date_superior(char* dateDebut,char* dateFin)
+{
+    char day[2];
+    day[0] = dateDebut[0];
+    day[1] = dateDebut[1];
+    int day_number_debut = atoi(day);
+    char month[2];
+    strncpy(month,&dateDebut[3],2);
+    int month_number_debut = atoi(month); 
+    char year[4];
+    year[0] = dateDebut[6];
+    year[1] = dateDebut[7];
+    year[2] = dateDebut[8];
+    year[3] = dateDebut[9];
+    int year_number_debut = atoi(year);
+
+    
+    day[0] = dateFin[0];
+    day[1] = dateFin[1];
+    int day_number_fin = atoi(day);
+    strncpy(month,&dateFin[3],2);
+    int month_number_fin = atoi(month); 
+    year[0] = dateFin[6];
+    year[1] = dateFin[7];
+    year[2] = dateFin[8];
+    year[3] = dateFin[9];
+    int year_number_fin = atoi(year);
+
+    if(year_number_fin < year_number_debut){
+        return -1;
+    }
+    else if(year_number_fin > year_number_debut){
+        return 0;
+    }
+
+    if(month_number_fin < month_number_debut){
+        return -1;
+    }
+    else if(month_number_fin > month_number_debut){
+        return 0;
+    }
+
+    if(day_number_fin < day_number_debut){
+        return -1;
+    }
+    else if(day_number_fin > day_number_debut){
+        return 0;
+    }
+}
+
+int date_is_ok(char* date,int size)
+{
+    if(size != 10){
+        printf("Taille non conforme\n");
+        return -1;
+    }
+    for(int i = 0 ; i < size ; i++){
+        if(i != 2 && i != 5){
+            if(date[i] < 48 || date[i] > 57){
+                printf("La date ne doit contenir que des chiffres\n");
+                return -1;
+            }
+        }
+    }
+    char day[2];
+    day[0] = date[0];
+    day[1] = date[1];
+    int day_number = atoi(day);
+    char month[2];
+    strncpy(month,&date[3],2);
+    int month_number = atoi(month); 
+    printf("%i",month_number);
+    if(month_number > 12){
+        printf("Rentrez un numero de mois valide %i > 12\n",atoi(month));
+        return -1;
+    }
+    char year[4];
+    year[0] = date[6];
+    year[1] = date[7];
+    year[2] = date[8];
+    year[3] = date[9];
+    int year_number = atoi(year);
+    if(year_number < actual_year()){
+        printf("Rentrez une année superieur a l'année actuel %d >= %d\n",year_number,actual_year());
+        return -1;
+    }
+
+    if(day_number > longueur_mois(month_number,year_number)){
+        printf("Jour invalid au moins correspondant\n");
+        return -1;
+    }
+    return 0;
+}
 
 void menu_test(SSL* ssl)
 {
@@ -37,9 +167,17 @@ void menu_test(SSL* ssl)
         printf("Que voulez vous faire?\n");
         printf("1. Creer electeur\n");
         printf("2. Supprimer electeur\n");
-        printf("3. Voter\n");
-        printf("4. Clore un vote\n");
-        printf("5. Quit\n");
+        printf("3. Verifier la presence d'un electeur\n");
+
+        printf("4. Voter pour une election\n");
+        printf("5. Update un electeur\n");
+        printf("6. Lire un electeur \n");
+        printf("7. AjoutElection\n");
+        printf("8. Supprimer une election\n");
+        printf("9. Update la question d'une election\n");
+        printf("10. Lire les details d'une election\n");
+        printf("11. Obtenir le resultat d'un vote\n");
+        printf("20. Quit\n");
         check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
         if(check == -1){
             perror("read");
@@ -47,43 +185,165 @@ void menu_test(SSL* ssl)
 
         switch(atoi(number))
         {
-            case CREERELECTOR:
+            case AJOUT_ELECTEUR:
             {
                 //creer electeur
                 
                 printf("Entrez id/nom electeur\n");
                 check = read(1,commande.commande.ajoutElecteur.identifiant,256);
-                commande.commande.ajoutElecteur.identifiant[check] = '\0'; 
+                commande.commande.ajoutElecteur.identifiant[check-1] = '\0'; 
                 commande.type = AJOUT_ELECTEUR;
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
                 break;
             }
-            case SUPPRIMERELECTEUR:
+            case SUPPRIME_ELECTEUR:
             {
                 printf("Entrez id/nom electeur\n");
                 check = read(1,commande.commande.supprimeElecteur.identifiant,256);
-                commande.commande.supprimeElecteur.identifiant[check] = '\0';
+                commande.commande.supprimeElecteur.identifiant[check-1] = '\0';
                 // supprimer electeur
                 commande.type = SUPPRIME_ELECTEUR;
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
                 break;
             }
-            case VOTEELECTEUR:
+            case EST_PRESENT:
+            {
+                printf("Entrez id/nom electeur\n");
+                check = read(1,commande.commande.estPresent.identifiant,256);
+                commande.commande.estPresent.identifiant[check-1] = '\0';
+                commande.type = EST_PRESENT;
+                SSL_write(ssl,&commande,sizeof(Commande));
+                break;
+            }
+            case CAST_VOTE:
             {
                 //verifier electeur existe
-                commande.type = EST_PRESENT;
+                printf("Entrez id/nom de l'election\n");
+                check = read(1,commande.commande.castVote.idElection,256);
+                commande.commande.castVote.idElection[check-1] = '\0';
+                printf("Id Election recuperer%s\n",commande.commande.castVote.idElection);
+                printf("Entrez id/nom de l'electeur\n");
+                check = read(1,commande.commande.castVote.identifiant,256);
+                commande.commande.castVote.identifiant[check-1] = '\0';
+                printf("option 0. ou option 1.\n");
+                check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+
+                while(atoi(number) != 0 && atoi(number) != 1)
+                {
+                    printf("option 0. ou option 1.\n");
+                    check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+                }
+                if(atoi(number) == 1){
+                    commande.commande.castVote.ballot = 1;
+                }
+                else{
+                    commande.commande.castVote.ballot = 0;
+
+                }
+                commande.commande.castVote.ballotSize = 4;
+                commande.type = CAST_VOTE;
                 memset(commande.signature,0,256);
+                SSL_write(ssl,&commande,sizeof(Commande));
+
                 //voter
                 break;
             }
-            case CLOREVOTE:
+            case UPDATE_ELECTEUR:
             {
+                printf("Entrez id/nom electeur\n");
+                check = read(1,commande.commande.updateElecteur.identifiant,256);
+                commande.commande.updateElecteur.identifiant[check-1] = '\0';
+                printf("Entrez nouvelle id/nom electeur\n");
+                check = read(1,commande.commande.updateElecteur.newId,256);
+                commande.commande.updateElecteur.newId[check-1] = '\0';
                 //clore le vote et avoir le resultat
                 memset(commande.signature,0,256);
-                commande.type = CAST_VOTE;
+                commande.type = UPDATE_ELECTEUR;
+                SSL_write(ssl,&commande,sizeof(Commande));
                 break;
+            }
+            case READ_ELECTEUR:
+            {
+                printf("Entrez id/nom electeur\n");
+                check = read(1,commande.commande.estPresent.identifiant,256);
+                commande.commande.estPresent.identifiant[check-1] = '\0';
+                commande.type = READ_ELECTEUR;
+                SSL_write(ssl,&commande,sizeof(Commande));
+                break;
+            }
+            case AJOUT_ELECTION:
+            {
+                commande.type = AJOUT_ELECTION;
+                printf("Entrer id/nom de l'election\n");
+                check = read(1,commande.commande.ajoutElection.identifiant,256);
+                commande.commande.ajoutElection.identifiant[check-1] = '\0';
+                printf("Entrer la date de debut format (jj/mm/aaaa)\n");
+                check = read(1,commande.commande.ajoutElection.dateDebut,256);
+                commande.commande.ajoutElection.dateDebut[check-1] = '\0';
+                
+                while(date_is_ok(commande.commande.ajoutElection.dateDebut,check-1) == -1){
+                    printf("Date invalid\n");
+                    printf("Entrer la date de debut format (jj/mm/aaaa)\n");
+                    check = read(1,commande.commande.ajoutElection.dateDebut,256);
+                    commande.commande.ajoutElection.dateDebut[check-1] = '\0';
+                }
+                printf("Entrer la date de fin format (jj/mm/aaaa)\n");
+                check = read(1,commande.commande.ajoutElection.dateFin,256);
+                commande.commande.ajoutElection.dateFin[check-1] = '\0';
+                while(date_is_ok(commande.commande.ajoutElection.dateFin,check-1) == -1 && date_superior(commande.commande.ajoutElection.dateDebut,commande.commande.ajoutElection.dateFin)){
+                    printf("Date invalid\n");
+                    printf("Entrer la date de fin format (jj/mm/aaaa)\n");
+                    check = read(1,commande.commande.ajoutElection.dateDebut,256);
+                    commande.commande.ajoutElection.dateDebut[check-1] = '\0';
+                }
+                printf("Entrez votre question fermer(oui/non)\n");
+                check = read(1,commande.commande.ajoutElection.question,256);
+                commande.commande.ajoutElection.question[check-1] = '\0';
+
+                strcpy(commande.commande.ajoutElection.status,"active\0");
+
+                SSL_write(ssl,&commande,sizeof(Commande));
+                break;
+            }
+            case SUPPRIME_ELECTION:
+            {
+                printf("Entrez id/nom de l'election\n");
+                check = read(1,commande.commande.supprimeElection.identifiant,256);
+                commande.commande.supprimeElection.identifiant[check-1] = '\0';
+                commande.type = SUPPRIME_ELECTION;
+    
+                SSL_write(ssl,&commande,sizeof(Commande));
+                break;
+            }
+            case UPDATE_ELECTION:
+            {
+                printf("Entrez id/nom de l'election\n");
+                check = read(1,commande.commande.updateElection.identifiant,256);
+                commande.commande.updateElection.identifiant[check-1] = '\0';
+                commande.type = UPDATE_ELECTION;
+                printf("Entrez la nouvelle question de l'election\n");
+                check = read(1,commande.commande.updateElection.question,256);
+                commande.commande.updateElection.question[check-1] = '\0';
+                SSL_write(ssl,&commande,sizeof(Commande));
+
+                break;
+            }
+            case READ_ELECTION:
+            {
+                printf("Entrez id/nom de l'election\n");
+                check = read(1,commande.commande.readElection.identifiant,256);
+                commande.commande.readElection.identifiant[check-1] = '\0';
+                commande.type = READ_ELECTION;
+                break;
+            }
+            case PROCESS_VOTES:
+            {
+                printf("Entrez id/nom de l'election\n");
+                check = read(1,commande.commande.processVotes.identifiant,256);
+                commande.commande.processVotes.identifiant[check-1] = '\0';
+                commande.type = PROCESS_VOTES;
             }
             case QUIT:
             {

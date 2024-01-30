@@ -8,9 +8,11 @@
 int handlercastvote(sqlite3 *db, Commande *cmd) {
     char *id = cmd->commande.castVote.identifiant;
     char* idElection = cmd->commande.castVote.idElection;
-    if (electeurExists(db, id, strlen(id) + 1) == 0 && Election_getIdFromNumeroID(db, idElection, strlen(idElection) + 1) == 0)
+    int intId = getIdFromNumeroID(db,cmd->commande.castVote.identifiant,  strlen(cmd->commande.castVote.identifiant)+1);
+    int intIdElection = Election_getIdFromNumeroID(db, idElection, strlen(idElection)+1);
+    if (intId != -1 && intIdElection != -1)
     {
-        Election_castVote(db, id, idElection, cmd->commande.castVote.ballot, cmd->commande.castVote.ballotSize, 1);
+        Election_castVote(db, intId, intIdElection, &cmd->commande.castVote.ballot, cmd->commande.castVote.ballotSize, NULL);
         return 0;
     }
     return -1;
