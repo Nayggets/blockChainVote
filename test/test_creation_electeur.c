@@ -13,10 +13,10 @@ int main(int argc, char *argv[])
     int rc;
     char *sql;
     rc = sqlite3_open("test.db", &db);
-    //delete table Electeur
+    //supprime table Electeur
     sql = "DROP TABLE IF EXISTS Electeur;";
     rc = sqlite3_exec(db, sql, 0, 0, &zErrMsg);
-    //create table Electeur
+    //creer table Electeur
     
     sql = "CREATE TABLE Electeur("  \
         "numeroID TEXT PRIMARY KEY NOT NULL);";
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     char *id = "id";
     strcpy(cmd->commande.ajoutElecteur.identifiant, id);
     handlerajoutelecteur(db, cmd);
-    //if good , print "Electeur added"
+    //si bon , affiche "Electeur added"
     if (electeurExists(db, id, strlen(id) + 1) == 0) {
         printf("Electeur added\n");
     }
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     handlerajoutelecteur(db, cmd);
     
 
-    //printf database
+    //printf base de donnee
     sql = "SELECT * from Electeur";
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);

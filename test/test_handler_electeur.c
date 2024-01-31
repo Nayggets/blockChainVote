@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     char *id = "id";
     strcpy(cmd->commande.ajoutElecteur.identifiant, id);
     handlerajoutelecteur(db, cmd);
-    //if good , print "Electeur added"
+  
     if (electeurExists(db, id, strlen(id) + 1) == 0) {
         printf("Electeur added\n");
     }
@@ -46,12 +46,13 @@ int main(int argc, char *argv[]) {
     strcpy(cmd->commande.ajoutElecteur.identifiant, id2);
     handlerajoutelecteur(db, cmd);
 
-    //we are going to try to delete the first electeur
+    //on va essayer de supprimer l'electeur avec id
     strcpy(cmd->commande.supprElecteur.identifiant, id);
     cmd->type = SUPPR_ELECTEUR;
     handlersupprimeElecteur(db, cmd);
 
-    //to finish , we are going to modify the electeur id 
+
+    // pour finir , on va modifier l'electeur id
     char *idNEW = "idNEW";
     strcpy(cmd->commande.updateElecteur.identifiant, id2);
     strcpy(cmd->commande.updateElecteur.newId, idNEW);
@@ -59,12 +60,13 @@ int main(int argc, char *argv[]) {
     handlerupdateelecteur(db, cmd);
 
 
-    //finally we are going to read the electeur with id so we can see if it is not there
+
+    // pour finir , on va lire l'electeur id pour voir si il n'est pas la
     strcpy(cmd->commande.readElecteur.identifiant, id);
     cmd->type = READ_ELECTEUR;
     handlerReadElecteur(db, cmd);
 
-        // printf database
+        // printf base de donnee
         sql = "SELECT * from Electeur";
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);

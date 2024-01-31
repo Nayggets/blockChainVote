@@ -228,12 +228,12 @@ void menu_test(SSL* ssl)
                 check = read(1,commande.commande.castVote.identifiant,256);
                 commande.commande.castVote.identifiant[check-1] = '\0';
                 printf("option 0. ou option 1.\n");
-                check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+                check = read(1, &number, 2); // juste pour eviter les avertissements du read on stock la valeur de retour
 
                 while(atoi(number) != 0 && atoi(number) != 1)
                 {
                     printf("option 0. ou option 1.\n");
-                    check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+                    check = read(1,&number,2); // juste pour eviter les avertissements du read on stock la valeur de retour
                 }
                 if(atoi(number) == 1){
                     commande.commande.castVote.ballot = 1;

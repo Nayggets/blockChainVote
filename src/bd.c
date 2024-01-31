@@ -286,7 +286,7 @@ int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size)
     return id;
 }
 
-// TODO
+
 void readElection(sqlite3 *db, int id)
 {
     sqlite3_stmt *stmt;
@@ -427,17 +427,6 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
             // Ajoutez ici le code pour traiter chaque vote
             mpz_mul(total,total,ballotBlob2);
             *p_totalvotes = *p_totalvotes + 1;
-            /*
-            int v = *((char *)ballotBlob);
-            if (v)
-            {
-                *p_option1 = *p_option1 + 1;
-            }
-            else
-            {
-                *p_option0 = *p_option0 + 1;
-            }
-            */
         }
 
         sqlite3_finalize(stmt);
@@ -472,7 +461,7 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
     */
 }
 
-// Pour cancel, il suffit de mettre 'canceled' dans le champ 'status'
+// Pour annulé, il suffit de mettre 'canceled' dans le champ 'status'
 void updateStatus(sqlite3 *db, int id, const char *status)
 {
     sqlite3_stmt *stmt;

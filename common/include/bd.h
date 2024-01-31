@@ -8,7 +8,7 @@ int database_close(sqlite3 *db);
 int database_init(sqlite3 *db);
 int database_exists(const char *path);
 
-// usecases electeur
+// case d'utilisation electeur
 void createElecteur(sqlite3 *db, const char *numeroID, int size);
 int electeurExists(sqlite3 *db, const char *numeroID, int size);
 void deleteElecteur(sqlite3 *db, const char *numeroID, int size);
@@ -16,7 +16,7 @@ void updateElecteur(sqlite3 *db, const char *oldNumeroID, int size1, const char 
 void readElecteur(sqlite3 *db, const char *numeroID, int size);
 int getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size);
 
-// usecases election
+// case d'utilisation election
 void createElection(sqlite3 *db, const char *identifiant, int sizeId, const char *question, const char *dateDebut, const char *dateFin, const char *status);
 void updateElection(sqlite3 *db, int id, const char *question);
 int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size);
