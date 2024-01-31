@@ -15,7 +15,7 @@ CodeErreur handlerestpresent(sqlite3 *db,Commande* cmd);
 
 CodeErreur handlersupprimeElecteur(sqlite3 *db, Commande* cmd);
 
-CodeErreur handlercastvote(sqlite3 *db, Commande *cmd);
+CodeErreur handlercastvote(sqlite3 *db, Commande *cmd,mpz_t n,mpz_t g);
 
 CodeErreur handlerupdateelecteur(sqlite3 *db, Commande* cmd);
 
@@ -29,5 +29,9 @@ CodeErreur handlerUpdateElection(sqlite3 *db, Commande *cmd);
 
 CodeErreur handlerReadElection(sqlite3 *db, Commande *cmd);
 
+CodeErreur handlerProcessVote(sqlite3 *db, Commande *cmd,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n,char* result);
+
+
+CodeErreur handlerUpdateStatus(sqlite3 *db, Commande *cmd);
 
 #endif

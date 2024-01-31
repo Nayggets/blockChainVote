@@ -341,8 +341,8 @@ void menu_test(SSL* ssl)
             case PROCESS_VOTES:
             {
                 printf("Entrez id/nom de l'election\n");
-                check = read(1,commande.commande.processVotes.identifiant,256);
-                commande.commande.processVotes.identifiant[check-1] = '\0';
+                check = read(1,commande.commande.processVotes.identifiantElection,256);
+                commande.commande.processVotes.identifiantElection[check-1] = '\0';
                 commande.type = PROCESS_VOTES;
             }
             case QUIT:

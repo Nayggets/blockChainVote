@@ -240,7 +240,7 @@ void* worker(void* data)
             }
             break;
         case CAST_VOTE:
-            code = handlercastvote(db,commande);
+            code = handlercastvote(db,commande,n,g);
             if(code == 0){
                 printf("Vote a fonctionner\n");
             }

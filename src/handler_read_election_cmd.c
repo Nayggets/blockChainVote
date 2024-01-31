@@ -8,10 +8,6 @@ CodeErreur handlerReadElection(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.readElection.identifiant;
     if(Election_getIdFromNumeroID(db, id, strlen(id)+1)){
         readElection(db, id, strlen(id)+1);
-        return 0;
-    }
-    if(Election_getIdFromNumeroID(db, id, strlen(id))){
-        readElection(db, id, strlen(id));
         return REUSSITE;
     } else {
         return ElECTION_PAS_PRESENTE;

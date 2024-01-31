@@ -3,6 +3,8 @@
 #include <aio.h>
 #include "protocol.h"
 #include <openssl/ssl.h>
+#include <gmp.h>
+
 typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
@@ -64,9 +66,13 @@ typedef struct
 
 typedef struct
 {
-    char identifiant[ENTITY_ID_SIZE];
+    char identifiantElection[ENTITY_ID_SIZE];
 } ProcessVotesCmd;
 
+typedef struct
+{
+    char identifiant[ENTITY_ID_SIZE];
+} UpdateStatusCmd;
 
 typedef enum
 {
@@ -81,7 +87,8 @@ typedef enum
     SUPPRIME_ELECTION,
     UPDATE_ELECTION,
     READ_ELECTION,
-    PROCESS_VOTES
+    PROCESS_VOTES,
+    UPDATE_STATUS
 } CommandType;
 
 
@@ -111,6 +118,7 @@ typedef struct
         UpdateElectionCmd updateElection;
         ReadElectionCmd readElection;
         ProcessVotesCmd processVotes;
+        UpdateStatusCmd updateStatus;
     } commande;
 } Commande;
 

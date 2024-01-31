@@ -512,10 +512,10 @@ void detectIfEnded(sqlite3 *db)
         {
             while (sqlite3_step(stmt) == SQLITE_ROW)
             {
-                if(strcmp(sqlite3_column_text(stmt, 1),"") != 0){
-                    char* dateFin = sqlite3_column_text(stmt, 2);
-                    if(strcmp(dateFin,date) == 0){
-                        updateStatus(db,sqlite3_column_int(stmt, 0),"closed");}
+                if(strcmp(sqlite3_column_text(stmt, 1),"closed") != 0 && strcmp(sqlite3_column_text(stmt, 1),"canceled") != 0){
+                    char* dateFin = sqlite3_column_text(stmt, 3);
+                    if(strcmp(dateFin,date) == 1){
+                        updateStatus(db,sqlite3_column_int(stmt, 1),"closed");}
                 }
             }
 
@@ -528,4 +528,3 @@ void detectIfEnded(sqlite3 *db)
         sleep(500);
     }
 }
-

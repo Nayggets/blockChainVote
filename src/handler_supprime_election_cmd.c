@@ -6,8 +6,10 @@
 
 CodeErreur handlerSupprimeElection(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.supprimeElection.identifiant;
-    if(Election_getIdFromNumeroID(db, id, strlen(id)+1)){
-        deleteElection(db, id, strlen(id)+1);
+    int realid = Election_getIdFromNumeroID(db, id, strlen(id)+1);
+
+    if(realid > 0){
+        deleteElection(db, realid);
         printf("Election supprimee\n");
         return REUSSITE;
     } else {
