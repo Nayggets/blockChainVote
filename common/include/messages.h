@@ -122,12 +122,19 @@ typedef struct
     } commande;
 } Commande;
 
+
 typedef struct client_fd
 {
     int fd;
     SSL* ssl;
 } client_fd;
 
+typedef struct 
+{
+    CodeErreur codeErreur;
+    CommandType command;
+    char message[256];
+}paquets;
 
 typedef struct 
 {

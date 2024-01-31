@@ -197,7 +197,94 @@ Commande* accessCommand()
 }
 
 
+void chaine_err(CommandType code_action,CodeErreur code_erreur,char* chaine_a_remplir)
+{
+  if(code_action == AJOUT_ELECTEUR && code_erreur == REUSSITE){
+    strcpy(chaine_a_remplir,"Reussite lors de l'ajout de l'electeur");
+  }
+  else if (code_action == AJOUT_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de l'ajout de l'electeur");
+  }
+  else if (code_action == SUPPRIME_ELECTEUR && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la suppression");
+  }
+  else if (code_action == SUPPRIME_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la suppression de l'electeur");
+  }
+  else if (code_action == EST_PRESENT && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la vérification de la présence de l'electeur");
+  }
+  else if (code_action == EST_PRESENT && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la vérification de la présence de l'electeur");
+  } 
+  else if (code_action == CAST_VOTE && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de l'ajout de l'electeur à l'election");
+  }
+  else if (code_action == CAST_VOTE && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec l'électeur n'est pas présent");
+  }
+  else if (code_action == CAST_VOTE && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec l'élection n'est pas présente");
+  }
+  else if (code_action == UPDATE_ELECTEUR && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la mise a jour de l'electeur");
+  }
+  else if (code_action == UPDATE_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la mise a jour de l'electeur");
+  }
+  else if (code_action == READ_ELECTEUR && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors du read");
+  }
+  else if (code_action == READ_ELECTEUR && code_erreur == ELECTEUR_PAS_PRESENT)
+  {
+    strcpy(chaine_a_remplir,"Echec lors du read");
+  }
+  else if (code_action == AJOUT_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de l'ajout de l'election");
+  }
+  else if (code_action == AJOUT_ELECTION && code_erreur == ElECTION_EXISTE_DEJA)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de l'ajout de l'election");
+  }
+  else if (code_action == SUPPRIME_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la suppression de l'élection");
+  }
+  else if (code_action == SUPPRIME_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la suppression de l'élection");
+  }
+  else if (code_action == UPDATE_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors de la mise à jour de l'élection");
+  }
+  else if (code_action == UPDATE_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec lors de la mise à jour de l'élection");
+  }
+  else if (code_action == READ_ELECTION && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Reussite lors du read de l'election");
+  }
+  else if (code_action == READ_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Echec lors du read de l'election");
+  }
+// reste proccesss vote a faire mais j'ai pas le handler ducoup
 
+}
 
 
 void* worker(void* data)
@@ -205,106 +292,137 @@ void* worker(void* data)
     sqlite3* db = data;
 
     printf("worker lancer\n");
-
+    paquets to_client;
+    
     while(1){
         Commande* commande = accessCommand();
         printf("Traitement Commande %d\n",commande->type);
-        int code;
+        to_client.command = commande->type;
         switch (commande->type)
         {
         case AJOUT_ELECTEUR:
-            code = handlerajoutelecteur(db,commande);
-            if(code == 0){
+            to_client.codeErreur = handlerajoutelecteur(db,commande);
+            if(to_client.codeErreur == REUSSITE){
+                chaine_err(AJOUT_ELECTEUR,code,"Super !");
                 printf("Electeur ajouter\n");
             }
             else{
+                chaine_err(AJOUT_ELECTEUR,code,"il manque un electeur");
                 printf("Error lors de l'ajout");
             }
             break;
         case SUPPRIME_ELECTEUR:
-            code = handlersupprimeElecteur(db,commande);
-            if(code == 0){
+            to_client.codeErreur = handlersupprimeElecteur(db,commande);
+            if(to_client.codeErreur == REUSSITE){
+                chaine_err(SUPPRIME_ELECTEUR,code,"Super !");
                 printf("Electeur supprimer\n");
             }
             else{
+                chaine_err(SUPPRIME_ELECTEUR,code,"Il manque un electeur ");
                 printf("Error lors de la suppression");
             }
             break;
         case EST_PRESENT:
-            code = handlerestpresent(db,commande);
-            if(code == 0){
+            to_client.codeErreur = handlerestpresent(db,commande);
+            if(to_client.codeErreur == REUSSITE){
+                chaine_err(EST_PRESENT,code,"Super !");
                 printf("Electeur est present\n");
             }
             else{
+                chaine_err(EST_PRESENT,code,"Il manque un electeur");
                 printf("Error lors du check est present");
             }
             break;
         case CAST_VOTE:
-            code = handlercastvote(db,commande,n,g);
-            if(code == 0){
+            to_client.codeErreur = handlercastvote(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Vote a fonctionner\n");
             }
             else{
                 printf("Error lors du vote\n");
             }
+            chaine_err(CAST_VOTE,code,"Erreur !");
+
             break;
         case UPDATE_ELECTEUR:
-            if(handlerupdateelecteur(db,commande) == 0){
+            to_client.codeErreur = handlerupdateelecteur(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Update a fonctionner\n");
             }
             else{
                 printf("Error lors de l'update\n");
             }
+            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
+
             break;
         case READ_ELECTEUR:
-            if(handlerReadElecteur(db,commande) == 0){
+            to_client.codeErreur = handlerReadElecteur(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Read election\n");
             }
             else{
                 printf("Error lors du read\n");
             }
+            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
+
             break;
         case AJOUT_ELECTION:
-            code = handlerAjoutelection(db,commande);
-            if(code == 0){
+            to_client.codeErreur = handlerAjoutelection(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Election creer avec succès\n");
             } 
             else{
                 printf("Error lors de la creation d'election\n");
             }
+            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
             break;
         case SUPPRIME_ELECTION:
-            if(handlerSupprimeElection(db,commande) == 0){
+            to_client.codeErreur = handlerSupprimeElection(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Supprimer Election\n");
             }
             else{
                 printf("Supprimer election\n");
             }
+            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
+
             break;
         case UPDATE_ELECTION:
-            if(handlerUpdateElection(db,commande)){
+            to_client.codeErreur = handlerUpdateElection(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Update Election\n");
             }
             else{
                 printf("Update Election\n");
             }
+            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
+
             break;
         case READ_ELECTION:
-            if(handlerReadElection(db,commande)){
+            to_client.codeErreur =handlerReadElection(db,commande);
+            if(to_client.codeErreur == REUSSITE){
                 printf("Read election\n");
             }
             else{
                 printf("Read election\n");
             }
+            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
+
             break;
         case PROCESS_VOTES:
             //if()
 
             break;
         default:
+            to_client.codeErreur = 0xff;
+            to_client.command = 0xff;
             printf("Commande inconnu abandon du traitement.\n");
             break;
         }
+        if(to_client.codeErreur != 0xff && to_client.command != 0xff){
+            SSL_write(task_commande)
+        }
+        
         free(commande);
     }
 }
