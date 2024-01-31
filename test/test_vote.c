@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
             database_init(db);
         }
 
-        // creation d une electionelection_LocalId
+        // creation d une election election_LocalId
         char idElection[ID_SIZE] = "EXXXXXXXXX";
         const char *question = "This is a binary question";
         createElection(db, idElection, ID_SIZE, question, "01/01/2023", "02/01/2023", "active");

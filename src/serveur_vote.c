@@ -80,7 +80,8 @@ void launch(void* data)
     //SSL *ssl;   
  
 
-    /* Create a TLS server context with certificates */
+
+    // Créer un contexte TLS avec des certificats
 
     ctx = SSL_CTX_new(TLS_server_method());
 
@@ -89,7 +90,7 @@ void launch(void* data)
     SSL_CTX_use_PrivateKey_file(ctx, "server.key", SSL_FILETYPE_PEM);
 
  
-    // socket create and verification 
+    // creation du socket et verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0); 
     if (sockfd == -1) { 
         printf("socket creation failed...\n"); 
@@ -99,12 +100,13 @@ void launch(void* data)
         printf("Socket successfully created..\n"); 
     bzero(&servaddr, sizeof(servaddr)); 
    
-    // assign IP, PORT 
+
+    // assigner IP, PORT
     servaddr.sin_family = AF_INET; 
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
     servaddr.sin_port = htons(PORT); 
    
-    // Binding newly created socket to given IP and verification 
+    // lier le nouveau socket à l'IP et verification
     if ((bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) { 
         printf("Socket bind failed...\n"); 
         exit(0); 
@@ -112,7 +114,8 @@ void launch(void* data)
     else
         printf("Socket successfully binded..\n"); 
    
-    // Now server is ready to listen and verification 
+
+    // Maintenant le serveur est pret a ecouter et verification
     if ((listen(sockfd, 5)) != 0) { 
         printf("Listen failed...\n"); 
         exit(0); 
@@ -122,7 +125,8 @@ void launch(void* data)
     len = sizeof(cli); 
     SSL* ssl;
     client_fd* client;
-    // Accept the data packet from client and verification 
+
+    // Accepter les données du client et verification
     int check = 0;
     while(1)
     {
