@@ -5,13 +5,13 @@
 #include "../common/include/bd.h"
 
 // Fonction pour mettre a jour un électeur
-CodeErreur handlerupdateelecteur(sqlite3 *db, Commande *cmd) {
+CodeErreur handlermiseajourelecteur(sqlite3 *db, Commande *cmd) {
     char *id = cmd->commande.updateElecteur.identifiant;
-    char *newId = cmd->commande.updateElecteur.newId;
+    char *nouveauId = cmd->commande.updateElecteur.nouveauId;
     if (electeurExists(db, id, strlen(id)+1) != 0)
     {
         
-        updateElecteur(db, id, strlen(id)+1, newId,strlen(newId)+1);
+        updateElecteur(db, id, strlen(id)+1, nouveauId,strlen(nouveauId)+1);
         printf("Electeur mis a jour");
         return REUSSITE;
     }

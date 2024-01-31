@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
         int yes = 0;
         int total = 0;
 
-        Election_processVotes(db, election_LocalId, &no, &yes, &total,g,lambda,mu,n);
+        Election_procederAuxResultatsVotes(db, election_LocalId, &no, &yes, &total,g,lambda,mu,n);
 
         printf("Résultat de l'élection: \n A la question '%s'\n Nombre de votant %d\n\t\tOui : %d (%.2f%%)\n\t\tNon : %d (%.2f%%)\n", question, total, yes, (total != 0) ? (double)yes * 100. / total : 0.0, no, (total != 0) ? (double)no * 100. / total : 0.0);
     }

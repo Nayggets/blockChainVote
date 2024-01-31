@@ -4,12 +4,12 @@
 #include "../common/include/messages.h"
 #include "../common/include/bd.h"
 
-CodeErreur handlerSupprimeElection(sqlite3 *db, Commande* cmd) {
+CodeErreur handlersupprimeelection(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.supprimeElection.identifiant;
-    int realid = Election_getIdFromNumeroID(db, id, strlen(id)+1);
+    int veritableId = Election_getIdFromNumeroID(db, id, strlen(id)+1);
 
-    if(realid > 0){
-        deleteElection(db, realid);
+    if(veritableId > 0){
+        deleteElection(db, veritableId);
         printf("Election supprimee\n");
         return REUSSITE;
     } else {

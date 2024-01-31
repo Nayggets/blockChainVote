@@ -13,25 +13,25 @@ CodeErreur handlerajoutelecteur(sqlite3 *db, Commande *cmd);
 
 CodeErreur handlerestpresent(sqlite3 *db,Commande* cmd);
 
-CodeErreur handlersupprimeElecteur(sqlite3 *db, Commande* cmd);
+CodeErreur handlersupprimeelecteur(sqlite3 *db, Commande* cmd);
 
 CodeErreur handlercastvote(sqlite3 *db, Commande *cmd,mpz_t n,mpz_t g);
 
-CodeErreur handlerupdateelecteur(sqlite3 *db, Commande* cmd);
+CodeErreur handlermiseajourelecteur(sqlite3 *db, Commande* cmd);
 
-CodeErreur handlerReadElecteur(sqlite3 *db, Commande* cmd); 
+CodeErreur handlerreadelecteur(sqlite3 *db, Commande* cmd); 
 
-CodeErreur handlerAjoutelection(sqlite3 *db, Commande *cmd);
+CodeErreur handlerajouteelection(sqlite3 *db, Commande *cmd);
 
-CodeErreur handlerSupprimeElection(sqlite3 *db, Commande *cmd);
+CodeErreur handlersupprimeelection(sqlite3 *db, Commande *cmd);
 
-CodeErreur handlerUpdateElection(sqlite3 *db, Commande *cmd);
+CodeErreur handlermiseajourelection(sqlite3 *db, Commande *cmd);
 
-CodeErreur handlerReadElection(sqlite3 *db, Commande *cmd);
+CodeErreur handlerreadelection(sqlite3 *db, Commande *cmd);
 
-CodeErreur handlerProcessVote(sqlite3 *db, Commande *cmd,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n,char* result);
+CodeErreur handlerprocederauxresultatsvote(sqlite3 *db, Commande *cmd,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n,char* result);
 
 
-CodeErreur handlerUpdateStatus(sqlite3 *db, Commande *cmd);
+CodeErreur handlermiseajourstatus(sqlite3 *db, Commande *cmd);
 
 #endif

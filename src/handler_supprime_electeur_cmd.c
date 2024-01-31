@@ -1,6 +1,6 @@
 #include "../common/include/handler.h"
 
-CodeErreur handlersupprimeElecteur(sqlite3 *db, Commande* cmd) {
+CodeErreur handlersupprimeelecteur(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.supprimeElecteur.identifiant;
     if(electeurExists(db, id, strlen(id)+1)){
         deleteElecteur(db, id, strlen(id)+1);

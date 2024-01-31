@@ -4,7 +4,7 @@
 #include "../common/include/messages.h"
 #include "../common/include/bd.h"
 
-CodeErreur handlerReadElection(sqlite3 *db, Commande* cmd) {
+CodeErreur handlerreadelection(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.readElection.identifiant;
     if(Election_getIdFromNumeroID(db, id, strlen(id)+1)){
         readElection(db, id, strlen(id)+1);

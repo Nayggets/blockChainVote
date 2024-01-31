@@ -392,7 +392,7 @@ void voidstartompz(mpz_t* mpz,void* data)
 }
 
 //
-void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_option1, int *p_totalvotes,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n)
+void Election_procederAuxResultatsVotes(sqlite3 *db, int electionId, int *p_option0, int *p_option1, int *p_totalvotes,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n)
 {
     sqlite3_stmt *stmt;
     const char *sql = "SELECT * FROM Vote WHERE idElection = ?;";
@@ -473,7 +473,7 @@ void Election_processVotes(sqlite3 *db, int electionId, int *p_option0, int *p_o
 }
 
 // Pour cancel, il suffit de mettre 'canceled' dans le champ 'status'
-void updateStatus(sqlite3 *db, int id, const char *status)
+void miseAJourStatus(sqlite3 *db, int id, const char *status)
 {
     sqlite3_stmt *stmt;
     const char *sql = "UPDATE Election SET status = ? WHERE id = ?;";
@@ -506,7 +506,7 @@ void detectIfEnded(sqlite3 *db)
         time_t t = time(NULL);
         struct tm tm = *localtime(&t);
         char date[20];
-        sprintf(date, "%d/%d/%d", tm.tm_mday + 1900, tm.tm_mon + 1, tm.tm_year);
+        sprintf(date, "%d/%d/%d", tm.tm_mjour + 1900, tm.tm_mon + 1, tm.tm_annee);
 
         if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
         {
@@ -515,7 +515,7 @@ void detectIfEnded(sqlite3 *db)
                 if(strcmp(sqlite3_column_text(stmt, 1),"closed") != 0 && strcmp(sqlite3_column_text(stmt, 1),"canceled") != 0){
                     char* dateFin = sqlite3_column_text(stmt, 3);
                     if(strcmp(dateFin,date) == 1){
-                        updateStatus(db,sqlite3_column_int(stmt, 1),"closed");}
+                        miseAJourStatus(db,sqlite3_column_int(stmt, 1),"closed");}
                 }
             }
 

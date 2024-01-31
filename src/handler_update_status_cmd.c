@@ -1,10 +1,10 @@
 #include "../common/include/handler.h"
 
-int handlerUpdateStatus(sqlite3 *db, Commande* cmd) {
-    char* id=cmd->commande.updateStatus.identifiant;
-    int realId = Election_getIdFromNumeroID(db, id, strlen(id));
-    if(realId=!-1){
-        updateStatus(db, realId, "canceled");
+int handlermiseajourstatus(sqlite3 *db, Commande* cmd) {
+    char* id=cmd->commande.miseAJourStatus.identifiant;
+    int veritableId = Election_getIdFromNumeroID(db, id, strlen(id));
+    if(veritableId=!-1){
+        miseAJourStatus(db, veritableId, "canceled");
         printf("Vote annulé\n");
         return REUSSITE;
     } else {

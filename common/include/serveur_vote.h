@@ -1,7 +1,7 @@
 #ifndef __SERVEUR_VOTE_H
 #define __SERVEUR_VOTE_H
 #include "./messages.h"
-void* launch(void *data);
+void* lancement(void *data);
 
-int fillCommand(Commande commande);
+int remplircommande(Commande commande);
 #endif

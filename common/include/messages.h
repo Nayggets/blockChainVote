@@ -31,8 +31,8 @@ typedef struct
 typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
-    char newId[ENTITY_ID_SIZE];
-} UpdateElecteurCmd;
+    char nouveauId[ENTITY_ID_SIZE];
+} MiseAJourElecteurCmd;
 
 typedef struct
 {
@@ -57,7 +57,7 @@ typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
     char question[256];
-} UpdateElectionCmd;
+} MiseAJourElectionCmd;
 
 typedef struct
 {
@@ -67,12 +67,12 @@ typedef struct
 typedef struct
 {
     char identifiantElection[ENTITY_ID_SIZE];
-} ProcessVotesCmd;
+} ProcederAuxResultatsVotesCmd;
 
 typedef struct
 {
     char identifiant[ENTITY_ID_SIZE];
-} UpdateStatusCmd;
+} MiseAJourStatusCmd;
 
 typedef enum
 {
@@ -81,15 +81,15 @@ typedef enum
     SUPPRIME_ELECTEUR,
     EST_PRESENT,
     CAST_VOTE,
-    UPDATE_ELECTEUR,
+    MISE_A_JOUR_ELECTEUR,
     READ_ELECTEUR,
     AJOUT_ELECTION,
     SUPPRIME_ELECTION,
-    UPDATE_ELECTION,
+    MISE_A_JOUR_ELECTION,
     READ_ELECTION,
-    PROCESS_VOTES,
-    UPDATE_STATUS
-} CommandType;
+    PROCEDER_AUX_RESULTATS_VOTE,
+    MISE_A_JOUR_STATUS
+} CommandeType;
 
 
 typedef enum
@@ -103,7 +103,7 @@ typedef enum
 //--
 typedef struct
 {
-    CommandType type;
+    CommandeType type;
     char signature[256]; // la signature de la commande
     union
     {
@@ -111,34 +111,34 @@ typedef struct
         SupprimeElecteurCmd supprimeElecteur;
         EstPresentCmd estPresent;
         CastVoteCmd castVote;
-        UpdateElecteurCmd updateElecteur;
+        MiseAJourElecteurCmd updateElecteur;
         ReadElecteurCmd readElecteur;
         AjoutElectionCmd ajoutElection;
         SupprimeElectionCmd supprimeElection;
-        UpdateElectionCmd updateElection;
+        MiseAJourElectionCmd updateElection;
         ReadElectionCmd readElection;
-        ProcessVotesCmd processVotes;
-        UpdateStatusCmd updateStatus;
+        ProcederAuxResultatsVotesCmd procederAuxResultatsVotes;
+        MiseAJourStatusCmd miseAJourStatus;
     } commande;
 } Commande;
 
 
-typedef struct client_fd
+typedef struct ClientFd
 {
     int fd;
     SSL* ssl;
-} client_fd;
+} ClientFd;
 
 typedef struct 
 {
     CodeErreur codeErreur;
-    CommandType command;
+    CommandeType command;
     char message[256];
-}paquets;
+}Paquets;
 
 typedef struct 
 {
     Commande* commande;
-    client_fd* client;
-} task_commande;
+    ClientFd* client;
+} TacheCommande;
 #endif

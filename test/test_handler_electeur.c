@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 #include "../src/handler_ajoutelecteur.c"
 #include "../src/handler_supprime_electeur_cmd.c"
-#include "../src/handler_update_electeur.c"
+#include "../src/handler_MISE_A_JOUR_ELECTEUR.c"
 #include "../src/handler_read_electeur_cmd.c"
 
 
@@ -49,20 +49,20 @@ int main(int argc, char *argv[]) {
     //we are going to try to delete the first electeur
     strcpy(cmd->commande.supprElecteur.identifiant, id);
     cmd->type = SUPPR_ELECTEUR;
-    handlersupprimeElecteur(db, cmd);
+    handlersupprimeelecteur(db, cmd);
 
     //to finish , we are going to modify the electeur id 
     char *idNEW = "idNEW";
     strcpy(cmd->commande.updateElecteur.identifiant, id2);
-    strcpy(cmd->commande.updateElecteur.newId, idNEW);
-    cmd->type = UPDATE_ELECTEUR;
-    handlerupdateelecteur(db, cmd);
+    strcpy(cmd->commande.updateElecteur.nouveauId, idNEW);
+    cmd->type = MISE_A_JOUR_ELECTEUR;
+    handlermiseajourelecteur(db, cmd);
 
 
     //finally we are going to read the electeur with id so we can see if it is not there
     strcpy(cmd->commande.readElecteur.identifiant, id);
     cmd->type = READ_ELECTEUR;
-    handlerReadElecteur(db, cmd);
+    handlerreadelecteur(db, cmd);
 
         // printf database
         sql = "SELECT * from Electeur";

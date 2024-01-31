@@ -5,7 +5,7 @@
 #include "../common/include/bd.h"
 
 // Fonction pour ajouter une election
-CodeErreur handlerAjoutelection(sqlite3 *db, Commande *cmd) {
+CodeErreur handlerajouteelection(sqlite3 *db, Commande *cmd) {
     char *id = cmd->commande.ajoutElection.identifiant;
     if (Election_getIdFromNumeroID(db, id, strlen(id)) == -1)
     {

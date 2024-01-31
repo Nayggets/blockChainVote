@@ -8,9 +8,9 @@ int main()
 
     pthread_t pthread;
     int thread = 4;
-    launch(&thread);
+    lancement(&thread);
     /* Obsolet depuis le switch TCP mais valider avant
-    printf("Server launch\n");
+    printf("Server lancement\n");
     Commande commande;
     commande.type = EST_PRESENT;
     EstPresentCmd estpresent;
@@ -34,9 +34,9 @@ int main()
     printf("commande %s\ntype %d\n",commande3.commande.estPresent.identifiant,commande3.type);
 
     printf("Commande 3 creer\n");
-    fillCommand(commande3);
-    fillCommand(commande);
-    fillCommand(commande2);
+    remplircommande(commande3);
+    remplircommande(commande);
+    remplircommande(commande2);
     sleep(20);
     */
 }
