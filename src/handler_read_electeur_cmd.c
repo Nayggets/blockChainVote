@@ -7,8 +7,8 @@
 CodeErreur handlerReadElecteur(sqlite3 *db, Commande* cmd) {
     char* id=cmd->commande.readElecteur.identifiant;
 
-    if(electeurExists(db, id, strlen(id))){
-        readElecteur(db, id, strlen(id));
+    if(electeurExists(db, id, strlen(id)+1)){
+        readElecteur(db, id, strlen(id)+1);
         return REUSSITE;
     } else {
         return ELECTEUR_PAS_PRESENT;

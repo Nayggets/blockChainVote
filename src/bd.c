@@ -286,8 +286,8 @@ int Election_getIdFromNumeroID(sqlite3 *db, const char *numeroID, int size)
     return id;
 }
 
-// TODO
-void readElection(sqlite3 *db, int id)
+// result size = 257 * 5
+void readElection(sqlite3 *db, int id, char *resultat)
 {
     sqlite3_stmt *stmt;
     const char *sql = "SELECT * FROM Election WHERE id = ?;";
@@ -295,10 +295,30 @@ void readElection(sqlite3 *db, int id)
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
     {
         sqlite3_bind_int(stmt, 1, id);
+        
 
         while (sqlite3_step(stmt) == SQLITE_ROW)
         {
-            printf("%s\n", sqlite3_column_text(stmt, 2)); // Pour la colonne 'question'
+            //printf("%s\n", sqlite3_column_text(stmt, 2)); // Pour la colonne 'question'
+            //concatener les valeurs de la ligne avec resultat et un espacement
+            char *id = sqlite3_column_text(stmt, 0);
+            char *identifiant = sqlite3_column_text(stmt, 1);
+            char *question = sqlite3_column_text(stmt, 2);
+            char *dateDebut = sqlite3_column_text(stmt, 3);
+            char *dateFin = sqlite3_column_text(stmt, 4);
+            char *status = sqlite3_column_text(stmt, 5);
+            char *space = " ";
+            strcat(resultat, id);
+            strcat(resultat, space);
+            strcat(resultat, identifiant);
+            strcat(resultat, space);
+            strcat(resultat, question);
+            strcat(resultat, space);
+            strcat(resultat, dateDebut);
+            strcat(resultat, space);
+            strcat(resultat, dateFin);
+            strcat(resultat, space);
+            strcat(resultat, status);
         }
 
         sqlite3_finalize(stmt);
@@ -527,4 +547,141 @@ void detectIfEnded(sqlite3 *db)
         }
         sleep(500);
     }
+}
+
+
+int adejavote(sqlite3 *db, int idVotant, int idElection)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT COUNT(*) FROM Vote WHERE idVotant = ? AND idElection = ?;";
+    int result = 0;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, idVotant);
+        sqlite3_bind_int(stmt, 2, idElection);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            result = sqlite3_column_int(stmt, 0) > 0;
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+
+    return result;
+}
+int tailleListNomsElections(sqlite3 *db)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT COUNT(*) FROM Election;";
+    int result = 0;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            result = sqlite3_column_int(stmt, 0);
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+
+    return result;
+}
+
+
+char* listenomselections(sqlite3 *db, int* taille)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT identifiant FROM Election;";
+    *taille = 256*tailleListNomsElections(db);
+    int tailleInt=(*taille);
+    if(tailleInt == 0){
+        return NULL;
+    }
+    char* result = malloc(sizeof(char)*tailleInt);
+    strcpy(result,"");
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            char* identifiant = sqlite3_column_text(stmt, 0);
+            strcat(result,identifiant);
+            strcat(result,"\n");
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+
+    return result;
+}
+
+int verifiesiclosed(sqlite3 *db, int idElection)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT status FROM Election WHERE id = ?;";
+    int result = 0;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, idElection);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            const char* status = sqlite3_column_text(stmt, 0);
+            if(strncmp(status,"closed",6) == 0){
+                result = 1;
+            }
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+
+    return result;
+}
+
+int verifieSiCanceled(sqlite3 *db, int idElection)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT status FROM Election WHERE id = ?;";
+    int result = 0;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, idElection);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            const char* status = sqlite3_column_text(stmt, 0);
+            if(strlen(status) == 8){
+                result = 1;
+            }
+        }
+
+        sqlite3_finalize(stmt);
+    }
+    else
+    {
+        fprintf(stderr, "Erreur de préparation: %s\n", sqlite3_errmsg(db));
+    }
+
+    return result;
 }

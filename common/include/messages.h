@@ -1,5 +1,5 @@
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#ifndef __MESSAGE_H
+#define __MESSAGE_H
 #include <aio.h>
 #include "protocol.h"
 #include <openssl/ssl.h>
@@ -88,7 +88,8 @@ typedef enum
     UPDATE_ELECTION,
     READ_ELECTION,
     PROCESS_VOTES,
-    UPDATE_STATUS
+    UPDATE_STATUS,
+    LIST_ELECTION
 } CommandType;
 
 
@@ -133,12 +134,18 @@ typedef struct
 {
     CodeErreur codeErreur;
     CommandType command;
-    char message[256];
+    char message[2024];
 }paquets;
 
 typedef struct 
 {
-    Commande* commande;
+    Commande commande;
     client_fd* client;
 } task_commande;
+
+
+typedef struct
+{
+    int size;
+} ListCommande;
 #endif

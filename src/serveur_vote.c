@@ -25,13 +25,13 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_cond_t cond2 = PTHREAD_COND_INITIALIZER;
 mpz_t n, lambda, g, mu;
-Commande commandes[256];
+task_commande commandes[256];
 int index_commandes = 0;
 const int PORT = 8888;
 
 
 void* worker(void*);
-int fillCommand(Commande commande);
+int fillCommand(task_commande commande);
 
 
 
@@ -39,12 +39,13 @@ void* receiveCommand(void* data)
 {
     client_fd* client = data;
     int size = sizeof(Commande);
-    char buff[sizeof(Commande)];
+    Commande commande;
     while(size == sizeof(Commande)){
-        Commande* commande;
-        commande = (Commande*)&buff[0];
-        fillCommand(*commande);
-        size = SSL_read(client->ssl,buff,size);
+        task_commande task_commande;
+        task_commande.commande = commande;
+        task_commande.client = client;
+        fillCommand(task_commande);
+        size = SSL_read(client->ssl,&commande,size);
 
     }
     printf("Client left\n");
@@ -161,14 +162,14 @@ void launch(void* data)
     
 }
 
-int fillCommand(Commande commande)
+int fillCommand(task_commande commande)
 {
     pthread_mutex_lock(&mutex);
     if(index_commandes >= 256){
         pthread_cond_wait(&cond2,&mutex);
     }
-    memcpy(&commandes[index_commandes],&commande,sizeof(Commande));
-    printf("commandes ajouté avec succès type = %d",commandes[index_commandes].type);
+    memcpy(&commandes[index_commandes],&commande,sizeof(task_commande));
+    printf("commandes ajouté avec succès type = %d",commandes[index_commandes].commande.type);
     index_commandes++;
     pthread_cond_signal(&cond);  
 
@@ -176,18 +177,17 @@ int fillCommand(Commande commande)
 
 }
 
-Commande* accessCommand()
+task_commande* accessCommand()
 {
     printf("\nCommande debut recuperation %d\n",index_commandes);
 
     pthread_mutex_lock(&mutex);
     if(index_commandes == 0){
         pthread_cond_wait(&cond,&mutex);
-
     }
-    Commande* commande = malloc(sizeof(Commande));
-    printf("Taille de commande %ld\n",sizeof(Commande));
-    memcpy(commande,&commandes[index_commandes-1],sizeof(Commande));
+    task_commande* commande = malloc(sizeof(task_commande));
+    printf("Taille de commande %ld\n",sizeof(task_commande));
+    memcpy(commande,&commandes[index_commandes-1],sizeof(task_commande));
     index_commandes--;
     pthread_cond_signal(&cond2);
     pthread_mutex_unlock(&mutex);
@@ -274,13 +274,17 @@ void chaine_err(CommandType code_action,CodeErreur code_erreur,char* chaine_a_re
   {
     strcpy(chaine_a_remplir,"Echec lors de la mise à jour de l'élection");
   }
-  else if (code_action == READ_ELECTION && code_erreur == REUSSITE)
-  {
-    strcpy(chaine_a_remplir,"Reussite lors du read de l'election");
-  }
   else if (code_action == READ_ELECTION && code_erreur == ElECTION_PAS_PRESENTE)
   {
     strcpy(chaine_a_remplir,"Echec lors du read de l'election");
+  }
+  else if (code_action == UPDATE_STATUS && code_erreur == ElECTION_PAS_PRESENTE)
+  {
+    strcpy(chaine_a_remplir,"Update status fail l'election n'est pas presente\n");
+  }
+  else if (code_action == UPDATE_STATUS && code_erreur == REUSSITE)
+  {
+    strcpy(chaine_a_remplir,"Update status Reussite\n");
   }
 // reste proccesss vote a faire mais j'ai pas le handler ducoup
 
@@ -293,136 +297,162 @@ void* worker(void* data)
 
     printf("worker lancer\n");
     paquets to_client;
-    
     while(1){
-        Commande* commande = accessCommand();
-        printf("Traitement Commande %d\n",commande->type);
-        to_client.command = commande->type;
-        switch (commande->type)
+
+        task_commande* task_commande = accessCommand();
+        printf("Traitement Commande %d\n",task_commande->commande.type);
+        int code;
+        switch (task_commande->commande.type)
         {
+            
         case AJOUT_ELECTEUR:
-            to_client.codeErreur = handlerajoutelecteur(db,commande);
+            to_client.codeErreur = handlerajoutelecteur(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
-                chaine_err(AJOUT_ELECTEUR,code,"Super !");
                 printf("Electeur ajouter\n");
             }
             else{
-                chaine_err(AJOUT_ELECTEUR,code,"il manque un electeur");
                 printf("Error lors de l'ajout");
             }
             break;
         case SUPPRIME_ELECTEUR:
-            to_client.codeErreur = handlersupprimeElecteur(db,commande);
+            to_client.codeErreur = handlersupprimeElecteur(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
-                chaine_err(SUPPRIME_ELECTEUR,code,"Super !");
+
                 printf("Electeur supprimer\n");
             }
             else{
-                chaine_err(SUPPRIME_ELECTEUR,code,"Il manque un electeur ");
-                printf("Error lors de la suppression");
+                printf("Error lors de la suppression\n");
             }
             break;
         case EST_PRESENT:
-            to_client.codeErreur = handlerestpresent(db,commande);
+            to_client.codeErreur = handlerestpresent(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
-                chaine_err(EST_PRESENT,code,"Super !");
                 printf("Electeur est present\n");
             }
             else{
-                chaine_err(EST_PRESENT,code,"Il manque un electeur");
-                printf("Error lors du check est present");
+                printf("Error lors du check est present\n");
             }
+
             break;
         case CAST_VOTE:
-            to_client.codeErreur = handlercastvote(db,commande);
+            to_client.codeErreur = handlercastvote(db,&task_commande->commande,n,g);
             if(to_client.codeErreur == REUSSITE){
+
                 printf("Vote a fonctionner\n");
             }
             else{
                 printf("Error lors du vote\n");
             }
-            chaine_err(CAST_VOTE,code,"Erreur !");
 
             break;
         case UPDATE_ELECTEUR:
-            to_client.codeErreur = handlerupdateelecteur(db,commande);
+            to_client.codeErreur = handlerupdateelecteur(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
                 printf("Update a fonctionner\n");
             }
             else{
                 printf("Error lors de l'update\n");
             }
-            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
 
             break;
         case READ_ELECTEUR:
-            to_client.codeErreur = handlerReadElecteur(db,commande);
+            to_client.codeErreur = handlerReadElecteur(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
                 printf("Read election\n");
             }
             else{
                 printf("Error lors du read\n");
             }
-            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
 
             break;
         case AJOUT_ELECTION:
-            to_client.codeErreur = handlerAjoutelection(db,commande);
+            to_client.codeErreur = handlerAjoutelection(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
+
                 printf("Election creer avec succès\n");
             } 
             else{
                 printf("Error lors de la creation d'election\n");
             }
-            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
             break;
         case SUPPRIME_ELECTION:
-            to_client.codeErreur = handlerSupprimeElection(db,commande);
+            to_client.codeErreur = handlerSupprimeElection(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
                 printf("Supprimer Election\n");
             }
             else{
                 printf("Supprimer election\n");
             }
-            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
 
             break;
         case UPDATE_ELECTION:
-            to_client.codeErreur = handlerUpdateElection(db,commande);
+            to_client.codeErreur = handlerUpdateElection(db,&task_commande->commande);
             if(to_client.codeErreur == REUSSITE){
                 printf("Update Election\n");
             }
             else{
                 printf("Update Election\n");
             }
-            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
 
             break;
         case READ_ELECTION:
-            to_client.codeErreur =handlerReadElection(db,commande);
+            char tab[257 * 5];
+            to_client.codeErreur = handlerReadElection(db,&task_commande->commande,tab);
+            memcpy(to_client.message,tab,257 * 5);
             if(to_client.codeErreur == REUSSITE){
                 printf("Read election\n");
             }
             else{
                 printf("Read election\n");
             }
-            chaine_err(UPDATE_ELECTEUR,to_client.codeErreur,to_client.message);
 
             break;
         case PROCESS_VOTES:
-            //if()
-
+            to_client.codeErreur = handlerProcessVote(db,&task_commande->commande,g,lambda,mu,n,to_client.message);
+            if(to_client.codeErreur == REUSSITE){
+                printf("Read election\n");
+            }
+            else{
+                printf("Read election\n");
+            }
             break;
+        case UPDATE_STATUS:
+            to_client.codeErreur = handlerUpdateStatus(db,&task_commande->commande);
+            if(to_client.codeErreur == REUSSITE){
+                printf("UPDATE_STATUS\n");
+            }
+            else{
+                printf("UPDATE_STATUS\n");
+            }
+            break;
+        case LIST_ELECTION:
+        {
+            
+            int taille;
+            char* list = listenomselections(db, &taille);
+            ListCommande listCommande;
+            listCommande.size = taille;
+            SSL_write(task_commande->client->ssl,&listCommande,sizeof(ListCommande));
+            if(taille !=0){
+                SSL_write(task_commande->client->ssl,list,taille);
+            }
+           break;
+        }
         default:
             to_client.codeErreur = 0xff;
             to_client.command = 0xff;
             printf("Commande inconnu abandon du traitement.\n");
             break;
         }
+
+        to_client.command = task_commande->commande.type;
         if(to_client.codeErreur != 0xff && to_client.command != 0xff){
-            SSL_write(task_commande)
+            chaine_err(to_client.command,to_client.codeErreur,to_client.message);
+
+            printf("\n code erreur : %i code action : %i phrase : %s\n",to_client.codeErreur,to_client.command,to_client.message);
+            SSL_write(task_commande->client->ssl,&to_client,sizeof(paquets));
+            to_client.message[0] = '\0';
         }
-        
-        free(commande);
+        free(task_commande);
     }
 }

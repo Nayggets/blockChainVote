@@ -27,7 +27,7 @@ CodeErreur handlerSupprimeElection(sqlite3 *db, Commande *cmd);
 
 CodeErreur handlerUpdateElection(sqlite3 *db, Commande *cmd);
 
-CodeErreur handlerReadElection(sqlite3 *db, Commande *cmd);
+CodeErreur handlerReadElection(sqlite3 *db, Commande* cmd,char* tab);
 
 CodeErreur handlerProcessVote(sqlite3 *db, Commande *cmd,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n,char* result);
 

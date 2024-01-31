@@ -18,7 +18,11 @@ CodeErreur handlercastvote(sqlite3 *db, Commande *cmd,mpz_t n,mpz_t g) {
     mpz_get_str(ballot,10,c);
     int intId = getIdFromNumeroID(db,cmd->commande.castVote.identifiant,  strlen(cmd->commande.castVote.identifiant)+1);
     int intIdElection = Election_getIdFromNumeroID(db, idElection, strlen(idElection)+1);
-    if (intId != -1 && intIdElection != -1)
+    int aDejaVote = adejavote(db,intId,intIdElection);
+    int voteFermer = verifiesiclosed(db,intId);
+    int voteCancel = verifieSiCanceled(db, intId);
+
+    if (intId != -1 && intIdElection != -1 && aDejaVote != 1 && voteFermer == 0 && voteCancel == 0)
     {
         Election_castVote(db, intId, intIdElection, ballot, BALLOT_SIZE, NULL);
         return REUSSITE;
@@ -27,8 +31,9 @@ CodeErreur handlercastvote(sqlite3 *db, Commande *cmd,mpz_t n,mpz_t g) {
     {
         return ELECTEUR_PAS_PRESENT;
     }
-     if (intIdElection == -1)
+    if (intIdElection == -1)
     {
         return ElECTION_PAS_PRESENTE;
     }
+    return ElECTION_PAS_PRESENTE;
 }

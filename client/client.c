@@ -92,25 +92,38 @@ int date_superior(char* dateDebut,char* dateFin)
     int year_number_fin = atoi(year);
 
     if(year_number_fin < year_number_debut){
+        printf("1");
         return -1;
     }
     else if(year_number_fin > year_number_debut){
+                printf("2");
+
         return 0;
     }
 
     if(month_number_fin < month_number_debut){
+                printf("3");
+
         return -1;
     }
     else if(month_number_fin > month_number_debut){
+                printf("4");
+
         return 0;
     }
 
     if(day_number_fin < day_number_debut){
+                printf("5");
+
         return -1;
     }
     else if(day_number_fin > day_number_debut){
+                printf("6");
+
         return 0;
     }
+
+    return 0;
 }
 
 int date_is_ok(char* date,int size)
@@ -157,44 +170,67 @@ int date_is_ok(char* date,int size)
     return 0;
 }
 
+void read_message_correction(paquets paquet)
+{
+    if(paquet.codeErreur){
+        printf("\033[31m");
+    }   
+    else{
+        printf("\033[32m");
+    }
+    printf("%s\n",paquet.message);
+
+    printf("\033[0m");
+}
+
+#define STATUS 6
+
 void menu_test(SSL* ssl)
 {
-    char number[2];
+    char number[3];
     int check = 0;
     Commande commande;
+    ListCommande listCommande;
+    char* list;
+    paquets paquet;
     while(atoi(number) != QUIT)
     {
-        printf("Que voulez vous faire?\n");
-        printf("1. Creer electeur\n");
-        printf("2. Supprimer electeur\n");
-        printf("3. Verifier la presence d'un electeur\n");
-
-        printf("4. Voter pour une election\n");
-        printf("5. Update un electeur\n");
-        printf("6. Lire un electeur \n");
-        printf("7. AjoutElection\n");
-        printf("8. Supprimer une election\n");
-        printf("9. Update la question d'une election\n");
-        printf("10. Lire les details d'une election\n");
-        printf("11. Obtenir le resultat d'un vote\n");
-        printf("20. Quit\n");
-        check = read(1,&number,2); // just pour eviter les warning du read on stock la valeur de retour
+        printf("Rentrez un chiffre pour executez une commande.\n");
+        printf("|********************************************|\n");
+        printf("| 1.Creer electeur                           |\n");
+        printf("| 2.Supprimer electeur                       |\n");
+        printf("| 3.Verifier la presence d'un electeur       |\n");
+        printf("| 4.Voter pour une election                  |\n");
+        printf("| 5.Update un electeur                       |\n");
+        printf("| 6.Cancel une election                      |\n");
+        printf("| 7.AjoutElection                            |\n");
+        printf("| 8.Supprimer une election                   |\n");
+        printf("| 9.Update la question d'une election        |\n");
+        printf("| 10.Lire les details d'une election         |\n");
+        printf("| 11.Obtenir le resultat d'un vote           |\n");
+        printf("| 13.Lister Election                         |\n");
+        printf("| 20.Quit                                    |\n");
+        printf("|********************************************|\n");
+        check = read(1,&number,3); // just pour eviter les warning du read on stock la valeur de retour
         if(check == -1){
             perror("read");
         }
+        number[check-1] = '\0';
 
         switch(atoi(number))
         {
+            
             case AJOUT_ELECTEUR:
             {
                 //creer electeur
-                
                 printf("Entrez id/nom electeur\n");
                 check = read(1,commande.commande.ajoutElecteur.identifiant,256);
                 commande.commande.ajoutElecteur.identifiant[check-1] = '\0'; 
                 commande.type = AJOUT_ELECTEUR;
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
+                
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case SUPPRIME_ELECTEUR:
@@ -206,6 +242,8 @@ void menu_test(SSL* ssl)
                 commande.type = SUPPRIME_ELECTEUR;
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
+
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case EST_PRESENT:
@@ -215,6 +253,8 @@ void menu_test(SSL* ssl)
                 commande.commande.estPresent.identifiant[check-1] = '\0';
                 commande.type = EST_PRESENT;
                 SSL_write(ssl,&commande,sizeof(Commande));
+                
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case CAST_VOTE:
@@ -247,6 +287,7 @@ void menu_test(SSL* ssl)
                 memset(commande.signature,0,256);
                 SSL_write(ssl,&commande,sizeof(Commande));
 
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 //voter
                 break;
             }
@@ -262,15 +303,19 @@ void menu_test(SSL* ssl)
                 memset(commande.signature,0,256);
                 commande.type = UPDATE_ELECTEUR;
                 SSL_write(ssl,&commande,sizeof(Commande));
+
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
-            case READ_ELECTEUR:
+            case STATUS:
             {
-                printf("Entrez id/nom electeur\n");
-                check = read(1,commande.commande.estPresent.identifiant,256);
-                commande.commande.estPresent.identifiant[check-1] = '\0';
-                commande.type = READ_ELECTEUR;
+                printf("Entrez id/nom election\n");
+                check = read(1,commande.commande.updateStatus.identifiant,256);
+                commande.commande.updateStatus.identifiant[check-1] = '\0';
+                commande.type = UPDATE_STATUS;
                 SSL_write(ssl,&commande,sizeof(Commande));
+
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case AJOUT_ELECTION:
@@ -292,7 +337,7 @@ void menu_test(SSL* ssl)
                 printf("Entrer la date de fin format (jj/mm/aaaa)\n");
                 check = read(1,commande.commande.ajoutElection.dateFin,256);
                 commande.commande.ajoutElection.dateFin[check-1] = '\0';
-                while(date_is_ok(commande.commande.ajoutElection.dateFin,check-1) == -1 && date_superior(commande.commande.ajoutElection.dateDebut,commande.commande.ajoutElection.dateFin)){
+                while(date_is_ok(commande.commande.ajoutElection.dateFin,check-1) == -1 || date_superior(commande.commande.ajoutElection.dateDebut,commande.commande.ajoutElection.dateFin) == -1){
                     printf("Date invalid\n");
                     printf("Entrer la date de fin format (jj/mm/aaaa)\n");
                     check = read(1,commande.commande.ajoutElection.dateDebut,256);
@@ -305,6 +350,8 @@ void menu_test(SSL* ssl)
                 strcpy(commande.commande.ajoutElection.status,"active\0");
 
                 SSL_write(ssl,&commande,sizeof(Commande));
+
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case SUPPRIME_ELECTION:
@@ -315,6 +362,8 @@ void menu_test(SSL* ssl)
                 commande.type = SUPPRIME_ELECTION;
     
                 SSL_write(ssl,&commande,sizeof(Commande));
+
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case UPDATE_ELECTION:
@@ -328,6 +377,7 @@ void menu_test(SSL* ssl)
                 commande.commande.updateElection.question[check-1] = '\0';
                 SSL_write(ssl,&commande,sizeof(Commande));
 
+                SSL_read(ssl,&paquet,sizeof(paquets));
                 break;
             }
             case READ_ELECTION:
@@ -336,6 +386,9 @@ void menu_test(SSL* ssl)
                 check = read(1,commande.commande.readElection.identifiant,256);
                 commande.commande.readElection.identifiant[check-1] = '\0';
                 commande.type = READ_ELECTION;
+                SSL_write(ssl,&commande,sizeof(Commande));
+                SSL_read(ssl,&paquet,sizeof(paquets));
+
                 break;
             }
             case PROCESS_VOTES:
@@ -344,13 +397,40 @@ void menu_test(SSL* ssl)
                 check = read(1,commande.commande.processVotes.identifiantElection,256);
                 commande.commande.processVotes.identifiantElection[check-1] = '\0';
                 commande.type = PROCESS_VOTES;
+
+                SSL_write(ssl,&commande,sizeof(Commande));
+                SSL_read(ssl,&paquet,sizeof(paquets));
+                break;
+            }
+            case LIST_ELECTION:
+            {
+                        
+                commande.type = LIST_ELECTION;
+
+                SSL_write(ssl,&commande,sizeof(Commande));
+
+                SSL_read(ssl,&listCommande,sizeof(ListCommande));
+                printf("%d size \n",listCommande.size);
+                if(listCommande.size != 0){
+                    list = malloc(sizeof(char) * listCommande.size);
+                    SSL_read(ssl,list,listCommande.size);
+                    list[listCommande.size] = '\0';
+                    printf("Liste des elections : %s\n",list);
+                    free(list);
+
+                }
+                SSL_read(ssl,&paquet,sizeof(paquets));
+                
+                break;
             }
             case QUIT:
             {
                 printf("application quited\n");
-                break;
+                return;
             }
+            
         }
+        read_message_correction(paquet);
     }
 
 }
@@ -403,12 +483,6 @@ int main(int argc, char *argv[]) {
     }
     menu_test(ssl);
     // Envoi et réception de données sécurisées
-    const char* message = "Zizon connecté";
-    SSL_write(ssl, message, strlen(message));
-
-    char buffer[1024];
-    SSL_read(ssl, buffer, sizeof(buffer));
-    printf("Server : %s\n", buffer);
 
     // Fermeture de la connexion SSL et libération des ressources
     SSL_shutdown(ssl);

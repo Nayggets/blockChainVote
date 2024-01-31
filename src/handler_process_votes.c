@@ -7,7 +7,7 @@
 // Fonction pour mettre a jour une election
 CodeErreur handlerProcessVote(sqlite3 *db, Commande *cmd,mpz_t g,mpz_t lambda, mpz_t mu, mpz_t n,char* result) {
     char* id = cmd->commande.processVotes.identifiantElection;
-    int realid = Election_getIdFromNumeroID(db, id, strlen(id));
+    int realid = Election_getIdFromNumeroID(db, id, strlen(id)+1);
     if (realid > 0)
     {
         int option1;

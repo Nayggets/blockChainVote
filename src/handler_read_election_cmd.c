@@ -4,10 +4,12 @@
 #include "../common/include/messages.h"
 #include "../common/include/bd.h"
 
-CodeErreur handlerReadElection(sqlite3 *db, Commande* cmd) {
+CodeErreur handlerReadElection(sqlite3 *db, Commande* cmd,char* tab) {
     char* id=cmd->commande.readElection.identifiant;
-    if(Election_getIdFromNumeroID(db, id, strlen(id)+1)){
-        readElection(db, id, strlen(id)+1);
+    int intId = Election_getIdFromNumeroID(db, id, strlen(id)+1);
+    if(intId != -1){
+        
+        readElection(db, intId, tab);
         return REUSSITE;
     } else {
         return ElECTION_PAS_PRESENTE;
