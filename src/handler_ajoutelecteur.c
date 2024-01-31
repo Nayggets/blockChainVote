@@ -7,7 +7,7 @@ CodeErreur handlerajoutelecteur(sqlite3 *db, Commande *cmd) {
     if (electeurExists(db, id, strlen(id)+1) == 0)
     {
         createElecteur(db, id, strlen(id)+1);
-        printf("Electeur creer");
+        printf("Electeur creee");
         return REUSSITE;
     }
     return ELECTEUR_PAS_PRESENT;

@@ -11,7 +11,7 @@ int main()
     // Encrypt a message (e.g., 42)
     mpz_set_ui(m, 1);
     encrypt(c, m, n, g);
-    gmp_printf("Encrypted message: %Zd\n", c);
+    gmp_printf("Message crypte: %Zd\n", c);
 
     // mpz_set(sum_encrypted, c);
     mpz_mul(sum_encrypted, c, c);             //+2
@@ -20,7 +20,7 @@ int main()
 
     // Decrypt the message
     decrypt(m, sum_encrypted, lambda, mu, n);
-    gmp_printf("Decrypted message : %Zd\n", m);
+    gmp_printf("Message decrypte: %Zd\n", m);
 
     return 0;
 }

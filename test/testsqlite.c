@@ -14,7 +14,7 @@ int main()
     rc = sqlite3_open("exemple.db", &db);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "Erreur d'ouverture de la base de données: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Erreur d'ouverture de la base de donnees: %s\n", sqlite3_errmsg(db));
         return 1;
     }
 
@@ -23,7 +23,7 @@ int main()
     rc = sqlite3_exec(db, sql_create, 0, 0, NULL);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "Erreur de création de table: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Erreur de creation de table: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
     }
@@ -33,7 +33,7 @@ int main()
     rc = sqlite3_prepare_v2(db, sql_insert, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
-        fprintf(stderr, "Erreur de préparation de la requête: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Erreur de preparation de la requete: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return 1;
     }
@@ -49,7 +49,7 @@ int main()
     }
     else
     {
-        printf("Insertion réussie\n");
+        printf("Insertion reussie\n");
     }
 
     // Nettoyer

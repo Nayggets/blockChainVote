@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         {NULL}};
 
     // Création d'un contexte d'option
-    context = g_option_context_new("- test pour la création de la base de donnée");
+    context = g_option_context_new("- test pour la creation de la base de donnee");
     g_option_context_add_main_entries(context, entries, NULL);
 
     // Analyse des options de ligne de commande
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     // Affichage des résultats
     if (verbose)
     {
-        g_print("Mode verbeux activé\n");
+        g_print("Mode verbeux active\n");
     }
     if (file_path != NULL)
     {
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
         g_assert_nonnull(db);
         if (needInit == -1)
         {
-            g_print("initilisation de la base de données");
+            g_print("initilisation de la base de donnees");
             database_init(db);
         }
 
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 
         Election_procederAuxResultatsVotes(db, election_LocalId, &no, &yes, &total,g,lambda,mu,n);
 
-        printf("Résultat de l'élection: \n A la question '%s'\n Nombre de votant %d\n\t\tOui : %d (%.2f%%)\n\t\tNon : %d (%.2f%%)\n", question, total, yes, (total != 0) ? (double)yes * 100. / total : 0.0, no, (total != 0) ? (double)no * 100. / total : 0.0);
+        printf("Resultat de l'election: \n A la question '%s'\n Nombre de votant %d\n\t\tOui : %d (%.2f%%)\n\t\tNon : %d (%.2f%%)\n", question, total, yes, (total != 0) ? (double)yes * 100. / total : 0.0, no, (total != 0) ? (double)no * 100. / total : 0.0);
     }
     else
     {

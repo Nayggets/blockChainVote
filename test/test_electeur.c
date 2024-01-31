@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         g_print("Chemin du fichier: %s\n", file_path);
         int needInit = database_exists(file_path);
         struct stat buffer;
-        g_print("exists ?%d", (stat(file_path, &buffer)));
+        g_print("existe ?%d", (stat(file_path, &buffer)));
         g_print("needInit: %d\n", needInit);
         g_assert(needInit == -1);
         sqlite3 *db = database_open(file_path);

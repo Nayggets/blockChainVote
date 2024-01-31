@@ -14,8 +14,8 @@ CodeErreur handlerprocederauxresultatsvote(sqlite3 *db, Commande *cmd,mpz_t g,mp
         int option0;
         int total_vote;
         Election_procederAuxResultatsVotes(db, veritableId, &option0, &option1, &total_vote, g, lambda, mu, n);
-        sprintf(result,"Résultat de l'élection: \n Nombre de votant %d\n\t\tOui : %d (%.2f%%)\n\t\tNon : %d (%.2f%%)\n", total_vote, option0, (total_vote != 0) ? (double)option0 * 100. / total_vote : 0.0, option1, (total_vote != 0) ? (double)option1 * 100. / total_vote : 0.0);
-        printf("Resultat de l'election process avec succès\n");
+        sprintf(result,"Resultat de l'election: \n Nombre de votant %d\n\t\tOui : %d (%.2f%%)\n\t\tNon : %d (%.2f%%)\n", total_vote, option0, (total_vote != 0) ? (double)option0 * 100. / total_vote : 0.0, option1, (total_vote != 0) ? (double)option1 * 100. / total_vote : 0.0);
+        printf("Resultat de l'election process avec succes\n");
         return REUSSITE;
     }
     return ElECTION_PAS_PRESENTE;

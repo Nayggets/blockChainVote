@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     handlerajoutelecteur(db, cmd);
     //if good , print "Electeur added"
     if (electeurExists(db, id, strlen(id) + 1) == 0) {
-        printf("Electeur added\n");
+        printf("Electeur ajoute\n");
     }
 
     char *id2 = "id2";
@@ -79,11 +79,11 @@ int main(int argc, char *argv[]) {
             }
         }
         if (res == SQLITE_DONE) {
-            printf("done\n");
+            printf("fait\n");
             break;
         }
         if (res != SQLITE_ROW && res != SQLITE_DONE) {
-            printf("error\n");
+            printf("erreur\n");
             break;
         }
     }

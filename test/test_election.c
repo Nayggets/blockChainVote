@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
         {NULL}};
 
     // Création d'un contexte d'option
-    context = g_option_context_new("- test pour la création de la base de donnée");
+    context = g_option_context_new("- test pour la creation de la base de donnee");
     g_option_context_add_main_entries(context, entries, NULL);
 
     // Analyse des options de ligne de commande
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     // Affichage des résultats
     if (verbose)
     {
-        g_print("Mode verbeux activé\n");
+        g_print("Mode verbeux active\n");
     }
     if (file_path != NULL)
     {
@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
         g_assert_nonnull(db);
         if (needInit == -1)
         {
-            g_print("initilisation de la base de données");
+            g_print("initilisation de la base de donnees");
             database_init(db);
         }
 
         // creation d une election
         char id[ID_SIZE] = "EXXXXXXXXX";
-        const char *question = "This is a binary question";
+        const char *question = "C'est une question binaire";
         createElection(db, id, ID_SIZE, question, "01/01/2023", "02/01/2023", "active");
         int localid = Election_getIdFromNumeroID(db, id, ID_SIZE);
         g_assert(localid == 1);
